@@ -10,7 +10,8 @@ eventinho/.sp_pak_info
 ```
 {
 	"depends": [
-		"teammanager"
+		"teammanager",
+		"https://www.doctormckay.com/download/scripting/include/morecolors.inc"
 	]
 	"name_append": "svb/eventinho/"
 }

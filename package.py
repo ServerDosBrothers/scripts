@@ -1,4 +1,4 @@
-import os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_util
+import os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_util, requests
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", action="store", required=True, dest="sm")
@@ -22,6 +22,7 @@ pak_gamedata = os.path.join(pak_sm,"gamedata")
 base_sp_includes = [
 	sm_scripting,
 	sm_include,
+	os.path.join(cwd,"tmp/include"),
 ]
 
 base_sp_exec = spcomp + " -O2 -v0 -z9"
@@ -83,7 +84,14 @@ def copy_folder(src, dst):
 			#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
 			distutils.dir_util.copy_tree(str(folder),newdst)
 
-os.makedirs(os.path.join(cwd,"tmp"),exist_ok=True)
+def handle_wget(url):
+	file_path = os.path.join(cwd,"tmp/include",os.path.basename(url))
+	if not os.path.exists(file_path):
+		with requests.get(url) as file_request:
+			with open(file_path,"wb+") as file:
+				file.write(file_request.content)
+
+os.makedirs(os.path.join(cwd,"tmp/include"),exist_ok=True)
 shutil.rmtree(pak,ignore_errors=True)
 
 for folder in cwd.glob("*"):
@@ -107,7 +115,10 @@ for folder in cwd.glob("*"):
 				sp_pak_info = json.load(file)
 				if "depends" in sp_pak_info:
 					for depend in sp_pak_info["depends"]:
-						handle_sp_includes(depend, extra_includes)
+						if "http" not in depend:
+							handle_sp_includes(depend, extra_includes)
+						else:
+							handle_wget(depend)
 		
 		handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, sp_pak_info, folder)
 	
