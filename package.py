@@ -22,7 +22,7 @@ pak_gamedata = os.path.join(pak_sm,"gamedata")
 base_sp_includes = [
 	sm_scripting,
 	sm_include,
-	os.path.join(cwd,"tmp/include"),
+	os.path.join(cwd,"extra_includes"),
 ]
 
 base_sp_exec = spcomp + " -O2 -v0 -z9"
@@ -85,13 +85,14 @@ def copy_folder(src, dst):
 			distutils.dir_util.copy_tree(str(folder),newdst)
 
 def handle_wget(url):
-	file_path = os.path.join(cwd,"tmp/include",os.path.basename(url))
+	file_path = os.path.join(cwd,"extra_includes",os.path.basename(url))
 	if not os.path.exists(file_path):
 		with requests.get(url) as file_request:
+			os.makedirs(file_path,exist_ok=True)
 			with open(file_path,"wb+") as file:
 				file.write(file_request.content)
 
-os.makedirs(os.path.join(cwd,"tmp/include"),exist_ok=True)
+os.makedirs(os.path.join(cwd,"tmp"),exist_ok=True)
 shutil.rmtree(pak,ignore_errors=True)
 
 for folder in cwd.glob("*"):
