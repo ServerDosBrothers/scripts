@@ -350,6 +350,7 @@ def handle_plugin(folder):
 					else:
 						file_type = "Plugin"
 					updater_str += "\t\t\"{}\" \"Path_Mod{}\"\n".format(file_type,file)
+				updater_str = updater_str[:-1]
 				updater_str += "\n\t}\n}"
 				update_path = os.path.join(pak,plugin["name"]+".txt")
 				with open(update_path,"w") as update:
