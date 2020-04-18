@@ -38,6 +38,10 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info):
 	gitfolder = os.path.basename(os.getcwd())
 	for file in folder.glob("*.sp"):
 		file_basename = os.path.basename(file)
+		if sp_pak_info:
+			if "ignore_plugins" in sp_pak_info:
+				if file_basename in sp_pak_info["ignore_plugins"]:
+					continue
 		print("Compiling " + file_basename + " from " + gitfolder + "\n")
 		code = ""
 		newfile_path = os.path.join(cwd,"tmp",file_basename)

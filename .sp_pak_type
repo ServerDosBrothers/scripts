@@ -34,6 +34,12 @@
 		"sp_pak_info": {
 			"depends": [
 				"Multi-Colors"
+			],
+			"ignore_plugins": [
+				"bench_colorlib.sp",
+				"bench_multicolors.sp",
+				"colorlib_example.sp",
+				"color_stripper.sp"
 			]
 		},
 		"path_map": {
