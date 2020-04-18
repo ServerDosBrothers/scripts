@@ -1,0 +1,55 @@
+{
+	"morecolors": {
+		"type": "wget",
+		"url": "https://www.doctormckay.com/download/scripting/include/morecolors.inc"
+	},
+	"Multi-Colors": {
+		"type": "git",
+		"url": "https://github.com/Bara/Multi-Colors.git",
+		"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include",
+		"addons/sourcemod/scripting": "addons/sourcemod/scripting",
+		"copy": {
+			"addons": "addons"
+		}
+	},
+	"DevZones": {
+		"type": "git",
+		"url": "https://github.com/Franc1sco/DevZones.git",
+		"sp_pak_info": {
+			"disable_warnings": [
+				234,241
+			]
+		},
+		"path_map": {
+			"addons/sourcemod/scripting/include": "DevZones (CORE PLUGIN)/scripting/include",
+			"addons/sourcemod/scripting": "DevZones (CORE PLUGIN)/scripting",
+			"copy": {
+				"DevZones (CORE PLUGIN)": "addons/sourcemod"
+			}
+		}
+	},
+	"colorlib-sm": {
+		"type": "git",
+		"url": "https://github.com/c0rp3n/colorlib-sm.git",
+		"sp_pak_info": {
+			"depends": [
+				"Multi-Colors"
+			]
+		},
+		"path_map": {
+			"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include",
+			"addons/sourcemod/scripting": "addons/sourcemod/scripting",
+			"copy": {
+				"addons": "addons"
+			}
+		}
+	},
+	"AutoExecConfig": {
+		"type": "git",
+		"url": "https://github.com/Impact123/AutoExecConfig.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": ".",
+			"addons/sourcemod/scripting": "."
+		}
+	}
+}
