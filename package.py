@@ -330,31 +330,32 @@ def handle_plugin(folder):
 		plugins = handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, sp_pak_info)
 		if plugins:
 			for plugin in plugins:
-				newfiles = copy.deepcopy(files)
-				smxpath = plugin["path"]
-				smxpath = smxpath.replace(pak,"")
-				newfiles.append(smxpath)
-				plugin_version = ""
-				if "version" in plugin:
-					plugin_version = plugin["version"]
-				plugin_note = ""
-				if "note" in plugin:
-					plugin_note = plugin["note"]
-				updater_str = "\"Updater\"\n{{\n\t\"Information\"\n\t{{\n\t\t\"Version\"\n\t\t{{\n\t\t\t\"Latest\" \"{}\"\n\t\t}}\n\t\t\"Notes\" \"{}\"\n\t}}\n\t\"Files\"\n\t{{\n".format(plugin_version,plugin_note)
-				for file in newfiles:
-					file = str(file).replace(str(folder), "")
-					ext = os.path.splitext(file)[1]
-					file_type = ""
-					if ext == ".inc" or ext == ".sp":
-						file_type = "Source"
-					else:
-						file_type = "Plugin"
-					updater_str += "\t\t\"{}\" \"Path_Mod{}\"\n".format(file_type,file)
-				updater_str = updater_str[:-1]
-				updater_str += "\n\t}\n}"
-				update_path = os.path.join(pak,plugin["name"]+".txt")
-				with open(update_path,"w") as update:
-					update.write(updater_str)
+				if "update_url" in plugin:
+					newfiles = copy.deepcopy(files)
+					smxpath = plugin["path"]
+					smxpath = smxpath.replace(pak,"")
+					newfiles.append(smxpath)
+					plugin_version = ""
+					if "version" in plugin:
+						plugin_version = plugin["version"]
+					plugin_note = ""
+					if "note" in plugin:
+						plugin_note = plugin["note"]
+					updater_str = "\"Updater\"\n{{\n\t\"Information\"\n\t{{\n\t\t\"Version\"\n\t\t{{\n\t\t\t\"Latest\" \"{}\"\n\t\t}}\n\t\t\"Notes\" \"{}\"\n\t}}\n\t\"Files\"\n\t{{\n".format(plugin_version,plugin_note)
+					for file in newfiles:
+						file = str(file).replace(str(folder), "")
+						ext = os.path.splitext(file)[1]
+						file_type = ""
+						if ext == ".inc" or ext == ".sp":
+							file_type = "Source"
+						else:
+							file_type = "Plugin"
+						updater_str += "\t\t\"{}\" \"Path_Mod{}\"\n".format(file_type,file)
+					updater_str = updater_str[:-1]
+					updater_str += "\n\t}\n}"
+					update_path = os.path.join(pak,plugin["name"]+".txt")
+					with open(update_path,"w") as update:
+						update.write(updater_str)
 			return plugins
 	return None
 
