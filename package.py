@@ -2,7 +2,13 @@ import os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_util,
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", action="store", required=True, dest="sm")
+parser.add_argument("-d", action="store",nargs="*",required=False, dest="defi")
 args = parser.parse_args()
+
+defines = ""
+if args.defi:
+	for d in args.defi:
+		defines += d + ' '
 
 cwd = pathlib.Path(os.getcwd())
 
@@ -27,18 +33,23 @@ base_sp_includes = [
 
 base_sp_exec = spcomp + " -O2 -v0 -z9"
 
-def handle_sp_folder(folder, extra_includes, sp_pak_info, gitfolder):
+def handle_sp_folder(folder, extra_includes, sp_pak_info):
 	folder = pathlib.Path(folder)
+	gitfolder = os.path.basename(os.getcwd())
 	for file in folder.glob("*.sp"):
 		file_basename = os.path.basename(file)
-		print("Compiling " + file_basename + " from " + os.path.basename(gitfolder) + "\n")
+		print("Compiling " + file_basename + " from " + gitfolder + "\n")
 		code = ""
 		newfile_path = os.path.join(cwd,"tmp",file_basename)
 		with open(file,"r") as newfile:
 			code = newfile.read()
-		commit = subprocess.check_output("git rev-parse HEAD", shell=True,cwd=os.getcwd())
-		commit = commit[:-1]
-		commit = commit.decode("utf-8")
+		commit = ""
+		if os.path.exists(os.path.join(os.getcwd(), ".git")):
+			commit = subprocess.check_output("git rev-parse HEAD", shell=True,cwd=os.getcwd())
+			commit = commit[:-1]
+			commit = commit.decode("utf-8")
+		else:
+			commit = "Unknown"
 		code = code.replace("$$GIT_COMMIT$$", commit)
 		with open(newfile_path,"w") as newfile:
 			newfile.write(code)
@@ -53,12 +64,15 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info, gitfolder):
 		includes_str = ""
 		for inc in includes:
 			includes_str += "-i \"" + str(inc) + "\" "
+		if "SVB-" in gitfolder:
+			file_basename = "svb/" + file_basename
 		if sp_pak_info:
 			if "name_append" in sp_pak_info:
 				file_basename = sp_pak_info["name_append"] + file_basename
 		output_path = os.path.join(pak_plugins,file_basename+".smx")
 		os.makedirs(pathlib.Path(output_path).parent, exist_ok=True)
 		exec = base_sp_exec + " \"" + str(newfile_path) + "\" -o \"" + output_path + "\" " + includes_str
+		exec += defines
 		subprocess.run(exec, shell=True,cwd=os.getcwd())
 		os.remove(newfile_path)
 		print("")
@@ -85,10 +99,11 @@ def copy_folder(src, dst):
 			distutils.dir_util.copy_tree(str(folder),newdst)
 
 def handle_wget(url):
-	file_path = os.path.join(cwd,"extra_includes",os.path.basename(url))
+	extra_includes = os.path.join(cwd,"extra_includes")
+	file_path = os.path.join(extra_includes,os.path.basename(url))
 	if not os.path.exists(file_path):
 		with requests.get(url) as file_request:
-			os.makedirs(file_path,exist_ok=True)
+			os.makedirs(extra_includes,exist_ok=True)
 			with open(file_path,"wb+") as file:
 				file.write(file_request.content)
 
@@ -121,7 +136,7 @@ for folder in cwd.glob("*"):
 						else:
 							handle_wget(depend)
 		
-		handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, sp_pak_info, folder)
+		handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, sp_pak_info)
 	
 shutil.rmtree(os.path.join(cwd,"tmp"),ignore_errors=True)
 
