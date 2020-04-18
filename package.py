@@ -188,6 +188,9 @@ def handle_compile_later(compile_later):
 			path_map = dep["path_map"]
 		
 		if path_map:
+			if "addons/sourcemod/plugins" in path_map:
+				folder = os.path.join(dep_path,path_map["addons/sourcemod/plugins"])
+				shutil.rmtree(folder,ignore_errors=True)
 			if "copy" in path_map:
 				for key, value in path_map["copy"].items():
 					folder = os.path.join(dep_path,key)
@@ -202,6 +205,7 @@ def handle_compile_later(compile_later):
 		if path_map:
 			if "addons/sourcemod/scripting" in path_map:
 				handle_sp_folder(os.path.join(dep_path,path_map["addons/sourcemod/scripting"]), extra_includes, sp_pak_info)
+				
 	if compile_later2:
 		handle_compile_later(compile_later2)
 	

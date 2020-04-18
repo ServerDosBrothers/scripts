@@ -8,6 +8,11 @@
 		"url": "https://github.com/Bara/Multi-Colors.git",
 		"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include",
 		"addons/sourcemod/scripting": "addons/sourcemod/scripting",
+		"sp_pak_info": {
+			"ignore_plugins": [
+				"multicolors_example.sp"
+			]
+		},
 		"copy": {
 			"addons": "addons"
 		}
@@ -23,6 +28,7 @@
 		"path_map": {
 			"addons/sourcemod/scripting/include": "DevZones (CORE PLUGIN)/scripting/include",
 			"addons/sourcemod/scripting": "DevZones (CORE PLUGIN)/scripting",
+			"addons/sourcemod/plugins": "DevZones (CORE PLUGIN)/plugins",
 			"copy": {
 				"DevZones (CORE PLUGIN)": "addons/sourcemod"
 			}
