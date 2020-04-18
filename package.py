@@ -1,16 +1,5 @@
 import re, os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_util, requests, copy, clone
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-s", action="store", required=True, dest="sm")
-parser.add_argument("-d", action="store",nargs="*",required=False, dest="defi")
-parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
-args = parser.parse_args()
-
-defines = ""
-if args.defi:
-	for d in args.defi:
-		defines += d + ' '
-
 cwd = pathlib.Path(os.getcwd())
 
 remove_tmp = True
@@ -18,12 +7,6 @@ remove_pak = False
 copy_pak = True
 copy_game = False
 gen_info = True
-
-sm_scripting = os.path.join(args.sm,"scripting")
-sm_include = os.path.join(sm_scripting,"include")
-sm_gamedata = os.path.join(args.sm,"gamedata")
-spcomp = os.path.join(sm_scripting,"spcomp")
-game = pathlib.Path(args.sm).parent.parent
 
 pak = os.path.join(cwd,"package")
 pak_sm = os.path.join(pak,"addons/sourcemod")
@@ -33,13 +16,8 @@ pak_plugins = os.path.join(pak_sm,"plugins")
 pak_gamedata = os.path.join(pak_sm,"gamedata")
 
 tmp_dir = os.path.join(cwd,"tmp")
-
-base_sp_includes = [
-	sm_scripting,
-	sm_include,
-]
-
-base_sp_exec = spcomp + " -O2 -v0 -z9 "
+thirdparty = os.path.join(cwd,"thirdparty")
+sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type")
 
 base_update_url = "https://raw.githubusercontent.com/ServerDosBrothers/package/master"
 post_update_url = "?token="
@@ -290,18 +268,6 @@ def copy_folder(src, dst):
 			#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
 			distutils.dir_util.copy_tree(str(folder),newdst)
 
-def handle_git_repo(dep, dep_path, extra_includes):
-	if "addons/sourcemod" in dep:
-		extra_includes += [os.path.join(dep["addons/sourcemod"], "include")]
-
-def handle_wget(url, folder):
-	file_path = os.path.join(folder,os.path.basename(url))
-	if not os.path.exists(file_path):
-		with requests.get(url) as file_request:
-			os.makedirs(folder,exist_ok=True)
-			with open(file_path,"wb+") as file:
-				file.write(file_request.content)
-
 def handle_depends(depends, extra_includes, compile_later):
 	for depend in depends:
 		is_root_repo = True
@@ -311,11 +277,12 @@ def handle_depends(depends, extra_includes, compile_later):
 				type = dep["type"]
 				dep_path = os.path.join(thirdparty,depend)
 				is_root_repo = False
+				#url = dep["url"]
 				if type == "wget":
-					handle_wget(dep["url"], dep_path)
+					#clone.handle_wget(url, dep_path)
 					extra_includes += [dep_path]
 				elif type == "git":
-					clone.clone(dep["url"], dep_path)
+					#clone.clone(url, dep_path)
 					if "path_map" in dep:
 						path_map = dep["path_map"]
 						if "addons/sourcemod/scripting/include" in path_map:
@@ -390,39 +357,6 @@ def handle_plugin(folder):
 			return plugins
 	return None
 
-thirdparty = os.path.join(cwd,"thirdparty")
-os.makedirs(thirdparty,exist_ok=True)
-os.makedirs(tmp_dir,exist_ok=True)
-if remove_pak:
-	shutil.rmtree(pak,ignore_errors=True)
-
-sp_pak_type = None
-sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type")
-if os.path.exists(sp_pak_type_path):
-	with open(sp_pak_type_path,"r") as file:
-		sp_pak_type = json.load(file)
-
-compile_later = []
-all_plugins = []
-
-if args.plu:
-	for folder in args.plu:
-		folder = os.path.join(cwd,folder)
-		plugins = handle_plugin(folder)
-		if plugins:
-			all_plugins += plugins
-else:
-	for folder in cwd.glob("*"):
-		if folder.is_file():
-			continue
-		if folder == "package":
-			continue
-		if folder == "scripts":
-			continue
-		plugins = handle_plugin(folder)
-		if plugins:
-			all_plugins += plugins
-	
 def handle_compile_later(compile_later):
 	compile_later2 = []
 	all_plugins2 = []
@@ -468,32 +402,88 @@ def handle_compile_later(compile_later):
 		return all_plugins2
 	else:
 		return None
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-s", action="store", required=True, dest="sm")
+	parser.add_argument("-d", action="store",nargs="*",required=False, dest="defi")
+	parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
+	args = parser.parse_args()
 	
-plugins = handle_compile_later(compile_later)
-if plugins:
-	all_plugins += plugins
+	sm_scripting = os.path.join(args.sm,"scripting")
+	sm_include = os.path.join(sm_scripting,"include")
+	sm_gamedata = os.path.join(args.sm,"gamedata")
+	spcomp = os.path.join(sm_scripting,"spcomp")
+	game = pathlib.Path(args.sm).parent.parent
+	
+	base_sp_exec = spcomp + " -O2 -v0 -z9 "
+	
+	base_sp_includes = [
+		sm_scripting,
+		sm_include,
+	]
+	
+	defines = ""
+	if args.defi:
+		for d in args.defi:
+			defines += d + ' '
+	
+	os.makedirs(thirdparty,exist_ok=True)
+	os.makedirs(tmp_dir,exist_ok=True)
+	if remove_pak:
+		shutil.rmtree(pak,ignore_errors=True)
 
-shutil.rmtree(os.path.join(pak,"addons/sourcemod/scripting"),ignore_errors=True)
+	sp_pak_type = None
+	if os.path.exists(sp_pak_type_path):
+		with open(sp_pak_type_path,"r") as file:
+			sp_pak_type = json.load(file)
 
-if gen_info:
-	info_str = ""
-	for plugin in all_plugins:
-		info_str += plugin["name"] + '\n'
-		info_str += "{\n\t"
-		if "version" in plugin:
-			info_str += "version: \"" + plugin["version"] + "\""
-			info_str += "\n\t"
-		if "update_url" in plugin:
-			info_str += "update_url: \"" + plugin["update_url"] + "\""
-			info_str += "\n\t"
-		info_str = info_str[:-2]
-		info_str += "\n}\n"
-	info_path = os.path.join(pak,"info.txt")
-	with open(info_path,"w") as info:
-		info.write(info_str)
+	compile_later = []
+	all_plugins = []
 
-if remove_tmp:
-	shutil.rmtree(tmp_dir,ignore_errors=True)
+	if args.plu:
+		for folder in args.plu:
+			folder = os.path.join(cwd,folder)
+			plugins = handle_plugin(folder)
+			if plugins:
+				all_plugins += plugins
+	else:
+		for folder in cwd.glob("*"):
+			if folder.is_file():
+				continue
+			if folder == "package":
+				continue
+			if folder == "scripts":
+				continue
+			plugins = handle_plugin(folder)
+			if plugins:
+				all_plugins += plugins
+		
+	plugins = handle_compile_later(compile_later)
+	if plugins:
+		all_plugins += plugins
 
-if copy_game:
-	copy_folder(pak,game)
+	shutil.rmtree(os.path.join(pak,"addons/sourcemod/scripting"),ignore_errors=True)
+
+	if gen_info:
+		info_str = ""
+		for plugin in all_plugins:
+			info_str += plugin["name"] + '\n'
+			info_str += "{\n\t"
+			if "version" in plugin:
+				info_str += "version: \"" + plugin["version"] + "\""
+				info_str += "\n\t"
+			if "update_url" in plugin:
+				info_str += "update_url: \"" + plugin["update_url"] + "\""
+				info_str += "\n\t"
+			info_str = info_str[:-2]
+			info_str += "\n}\n"
+		info_path = os.path.join(pak,"info.txt")
+		with open(info_path,"w") as info:
+			info.write(info_str)
+
+	if remove_tmp:
+		shutil.rmtree(tmp_dir,ignore_errors=True)
+
+	if copy_game:
+		copy_folder(pak,game)
