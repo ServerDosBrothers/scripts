@@ -82,6 +82,9 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info):
 			if "warning_errors" in sp_pak_info:
 				if sp_pak_info["warning_errors"] == True:
 					extra_flags += "-E "
+			if "defines" in sp_pak_info:
+				for define, value in sp_pak_info["defines"].items():
+					extra_flags += define + '=' + value + ' '
 		output_path = os.path.join(pak_plugins,file_basename+".smx")
 		os.makedirs(pathlib.Path(output_path).parent, exist_ok=True)
 		exec = base_sp_exec + " \"" + str(newfile_path) + "\" -o \"" + output_path + "\" " + includes_str + extra_flags
