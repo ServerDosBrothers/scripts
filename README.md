@@ -11,11 +11,13 @@ eventinho/.sp_pak_info
 ```
 {
 	"depends": [
-		"teammanager",
-		"https://www.doctormckay.com/download/scripting/include/morecolors.inc"
+		"SVB-Teammanager",
+		"morecolors"
 	]
 	"name_append": "svb/eventinho/"
 }
 ```  
+
+e tbm editar o .sp_pak_type nessa pasta
 
 "name_append" adiciona a string ao nome do plugin qndo compilado  
