@@ -4,6 +4,7 @@ from clone import clone
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", action="store", required=True, dest="sm")
 parser.add_argument("-d", action="store",nargs="*",required=False, dest="defi")
+parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
 args = parser.parse_args()
 
 defines = ""
@@ -152,15 +153,7 @@ if os.path.exists(sp_pak_type_path):
 	with open(sp_pak_type_path,"r") as file:
 		sp_pak_type = json.load(file)
 
-compile_later  =[]
-
-for folder in cwd.glob("*"):
-	if folder.is_file():
-		continue
-	if folder == "package":
-		continue
-	if folder == "scripts":
-		continue
+def handle_plugin(folder):
 	addons = os.path.join(folder,"addons")
 	if os.path.exists(addons):
 		os.chdir(folder)
@@ -177,6 +170,22 @@ for folder in cwd.glob("*"):
 					handle_depends(sp_pak_info["depends"], extra_includes, compile_later)
 		
 		handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, sp_pak_info)
+
+compile_later  =[]
+
+if args.plu:
+	for folder in args.plu:
+		folder = os.path.join(cwd,folder)
+		handle_plugin(folder)
+else:
+	for folder in cwd.glob("*"):
+		if folder.is_file():
+			continue
+		if folder == "package":
+			continue
+		if folder == "scripts":
+			continue
+		handle_plugin(folder)
 	
 def handle_compile_later(compile_later):
 	compile_later2 = []
