@@ -52,7 +52,7 @@ if __name__ == "__main__":
 			for name in sp_pak_type:
 				dep = sp_pak_type[name]
 				url = dep["url"]
-				dep_path = get_dep_path(name,True)
+				dep_path = package.get_dep_path(name,True)
 				if ".git" in url:
 					clone(url, dep_path)
 				else:
