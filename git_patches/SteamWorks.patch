@@ -1,3 +1,16 @@
+diff --git a/.gitignore b/.gitignore
+index 114c66c..b43b928 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -25,4 +25,6 @@
+ [Dd]ebug - */
+ [Rr]elease - */
+ [Dd]ebug/
+-[Rr]elease/
+\ No newline at end of file
++[Rr]elease/
++
++build/
 diff --git a/AMBuildScript b/AMBuildScript
 index 839b733..4b3ad72 100644
 --- a/AMBuildScript

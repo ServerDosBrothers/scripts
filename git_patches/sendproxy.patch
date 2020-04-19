@@ -1,3 +1,13 @@
+diff --git a/.gitignore b/.gitignore
+index 259148f..7170c9a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -30,3 +30,5 @@
+ *.exe
+ *.out
+ *.app
++
++build/
 diff --git a/addons/sourcemod/extensions/sendproxy.ext.2.csgo.dll b/addons/sourcemod/extensions/sendproxy.ext.2.csgo.dll
 deleted file mode 100644
 index 7b98a3cea8cc1ccb6707ff53b02fe8149f81a4b0..0000000000000000000000000000000000000000
