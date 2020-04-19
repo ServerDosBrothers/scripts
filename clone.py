@@ -2,19 +2,21 @@ import os, sys, argparse, requests, json, pathlib, subprocess, package
 
 cwd = pathlib.Path(os.getcwd())
 
-def clone(url, path):
+def clone(url, path, branch="master"):
 	old_cwd = os.getcwd()
-	if os.path.exists(path):
-		os.chdir(path)
-		subprocess.run("git fetch", shell=True,cwd=os.getcwd())
-		subprocess.run("git reset --hard", shell=True,cwd=os.getcwd())
-		subprocess.run("git clean --force -d", shell=True,cwd=os.getcwd())
-		os.chdir(old_cwd)
+	os.makedirs(path,exist_ok=True)
+	os.chdir(path)
+	if os.path.exists(os.path.join(path,".git")):
+		subprocess.run("git fetch",shell=True,cwd=os.getcwd())
+		subprocess.run("git reset --hard",shell=True,cwd=os.getcwd())
+		subprocess.run("git clean --force -d",shell=True,cwd=os.getcwd())
 	else:
-		os.makedirs(path,exist_ok=True)
-		os.chdir(path)
-		os.system("git clone --recursive \""+url+"\" \"" + path + "\"")
-		os.chdir(old_cwd)
+		clone_cmd = "git clone --recursive \""+url+"\" \"" + path + "\" --branch=\"" + branch +"\""
+		subprocess.run(clone_cmd,shell=True,cwd=os.getcwd())
+	patch_path = os.path.join(cwd,"scripts/git_patches",os.path.basename(path)+".patch")
+	if os.path.exists(patch_path):
+		subprocess.run("git apply \"" + patch_path + "\"",shell=True,cwd=os.getcwd())
+	os.chdir(old_cwd)
 
 def handle_wget(url, folder):
 	file_path = os.path.join(folder,os.path.basename(url))

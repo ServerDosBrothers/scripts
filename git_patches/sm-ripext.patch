@@ -1,0 +1,43 @@
+diff --git a/AMBuildScript b/AMBuildScript
+index e9bba9a..6b67263 100644
+--- a/AMBuildScript
++++ b/AMBuildScript
+@@ -90,7 +90,7 @@ class ExtensionConfig(object):
+       '-pipe',
+       '-fno-strict-aliasing',
+       '-Wall',
+-      '-Werror',
++      #'-Werror',
+       '-Wno-unused',
+       '-Wno-switch',
+       '-Wno-array-bounds',
+diff --git a/PackageScript b/PackageScript
+index b1532de..e671d37 100644
+--- a/PackageScript
++++ b/PackageScript
+@@ -51,9 +51,9 @@ CopyFiles('pawn/scripting/include/ripext', 'addons/sourcemod/scripting/include/r
+ #  'otherconfig.cfg,
+ #  ]
+ #)
+-CopyFiles(builder.buildPath, 'addons/sourcemod/configs/ripext',
+-  [ 'ca-bundle.crt' ]
+-)
++#CopyFiles(builder.buildPath, 'addons/sourcemod/configs/ripext',
++#  [ 'ca-bundle.crt' ]
++#)
+ 
+ # Copy binaries.
+ for cxx_task in Extension.extensions:
+diff --git a/curl/lib/config-sm-linux.h b/curl/lib/config-sm-linux.h
+index 74cec5b..36dd13a 100644
+--- a/curl/lib/config-sm-linux.h
++++ b/curl/lib/config-sm-linux.h
+@@ -675,7 +675,7 @@
+ /* #undef HAVE_STRNICMP */
+ 
+ /* Define to 1 if you have the <stropts.h> header file. */
+-#define HAVE_STROPTS_H 1
++#undef HAVE_STROPTS_H
+ 
+ /* Define to 1 if you have the strstr function. */
+ #define HAVE_STRSTR 1

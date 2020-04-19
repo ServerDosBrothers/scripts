@@ -17,23 +17,6 @@
 			"addons": "addons"
 		}
 	},
-	"DevZones": {
-		"type": "git",
-		"url": "https://github.com/Franc1sco/DevZones.git",
-		"sp_pak_info": {
-			"disable_warnings": [
-				234,241
-			]
-		},
-		"path_map": {
-			"addons/sourcemod/scripting/include": "DevZones (CORE PLUGIN)/scripting/include",
-			"addons/sourcemod/scripting": "DevZones (CORE PLUGIN)/scripting",
-			"addons/sourcemod/plugins": "DevZones (CORE PLUGIN)/plugins",
-			"copy": {
-				"DevZones (CORE PLUGIN)": "addons/sourcemod"
-			}
-		}
-	},
 	"colorlib-sm": {
 		"type": "git",
 		"url": "https://github.com/c0rp3n/colorlib-sm.git",
@@ -62,6 +45,44 @@
 		"path_map": {
 			"addons/sourcemod/scripting/include": ".",
 			"addons/sourcemod/scripting": "."
+		}
+	},
+	"sm-ripext": {
+		"type": "git",
+		"url": "https://github.com/ErikMinekus/sm-ripext.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "pawn/scripting/include"
+		}
+	},
+	"stocksoup": {
+		"type": "git",
+		"url": "https://github.com/nosoop/stocksoup.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": ".."
+		}
+	},
+	"TF2Items": {
+		"type": "git",
+		"url": "https://github.com/asherkin/TF2Items.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "pawn"
+		}
+	},
+	"dhooks2-dynhooks": {
+		"type": "git",
+		"url": "https://github.com/PerfectLaugh/dhooks2-dynhooks.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "sourcemod/scripting/include"
+		},
+		"copy": {
+			"sourcemod/gamedata": "addons/sourcemod/gamedata"
+		}
+	},
+	"SteamWorks": {
+		"type": "git",
+		"url": "https://github.com/KyleSanderson/SteamWorks.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "Pawn/includes"
 		}
 	}
 }

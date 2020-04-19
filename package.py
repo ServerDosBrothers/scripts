@@ -159,7 +159,7 @@ def handle_sp_folder(folder, extra_includes, gitfolder, sp_pak_info):
 		with open(file,"r") as newfile:
 			code = newfile.read()
 		commit = ""
-		if os.path.exists(os.path.join(gitfolder, ".git")):
+		if os.path.exists(os.path.join(gitfolder,".git")):
 			old_cwd = os.getcwd()
 			os.chdir(gitfolder)
 			commit = subprocess.check_output("git rev-parse HEAD", shell=True,cwd=os.getcwd())
@@ -208,37 +208,27 @@ def handle_sp_folder(folder, extra_includes, gitfolder, sp_pak_info):
 		plugin["name"] = file_basename
 		output_path = os.path.join(pak_plugins,extra_path,file_basename+".smx")
 		plugin["path"] = output_path
-		if not os.path.exists(output_path):
-			tmp_path = output_path
-		else:
-			tmp_path = os.path.join(tmp_dir,extra_path,file_basename+".smx")
-		os.makedirs(pathlib.Path(tmp_path).parent, exist_ok=True)
-		exec = base_sp_exec + "\"" + str(newfile_path) + "\" -o \"" + tmp_path + "\" " + includes_str + extra_flags
+		os.makedirs(pathlib.Path(output_path).parent, exist_ok=True)
+		exec = base_sp_exec + "\"" + str(newfile_path) + "\" -o \"" + output_path + "\" " + includes_str + extra_flags
 		exec += defines
-		stdout = subprocess.check_output(exec, shell=True,cwd=os.getcwd())
-		stdout = stdout[:-1]
-		stdout = stdout.decode("utf-8")
-		idx = stdout.find("Code size:")
-		if idx:
-			stdout = stdout[:idx-1]
-			print(stdout)
-		if tmp_path != output_path:
-			changed = True
-			'''
-			with open(output_path, "rb") as old_file:
-				old_data = old_file.read()
-				with open(tmp_path, "rb") as new_file:
-					new_data = new_file.read()
-					i = 0
-					while True:
-						if i >= len(old_data) or i >= len(new_data):
-							break
-						print(old_data[i] == new_data[i])
-						i += 1
-			'''
-			if changed:
-				os.remove(output_path)
-				shutil.copy(tmp_path, output_path)
+		stdout = subprocess.run(exec, shell=True,cwd=os.getcwd(), stdout=subprocess.PIPE).stdout
+		if stdout:
+			stdout = stdout[:-1]
+			stdout = stdout.decode("utf-8")
+			idx = stdout.find("Code size:")
+			if idx != -1:
+				if idx:
+					stdout = stdout[:idx-1]
+				else:
+					stdout = ""
+			idx = stdout.find("Compilation aborted.")
+			if idx != -1:
+				if idx:
+					stdout = stdout[:idx-2]
+				else:
+					stdout = ""
+			if stdout:
+				print(stdout)
 		if remove_tmp:
 			os.remove(newfile_path)
 		plugins.append(plugin)
@@ -265,14 +255,16 @@ def handle_depends(depends, extra_includes, compile_later):
 			if depend in sp_pak_type:
 				dep = sp_pak_type[depend]
 				type = dep["type"]
-				dep_path = os.path.join(thirdparty,depend)
+				dep_path = os.path.join(cwd,"server/sources",depend)
+				if not os.path.exists(dep_path):
+					dep_path = os.path.join(thirdparty,depend)
 				is_root_repo = False
-				#url = dep["url"]
+				url = dep["url"]
 				if type == "wget":
-					#clone.handle_wget(url, dep_path)
+					clone.handle_wget(url, dep_path)
 					extra_includes += [dep_path]
 				elif type == "git":
-					#clone.clone(url, dep_path)
+					clone.clone(url, dep_path)
 					if "path_map" in dep:
 						path_map = dep["path_map"]
 						if "addons/sourcemod/scripting/include" in path_map:
@@ -422,7 +414,7 @@ if __name__ == "__main__":
 	spcomp = os.path.join(sm_scripting,"spcomp")
 	game = pathlib.Path(args.sm).parent.parent
 	
-	base_sp_exec = spcomp + " -O2 -v0 -z9 "
+	base_sp_exec = "\"" + spcomp + "\" -O2 -v0 -z9 "
 	
 	base_sp_includes = [
 		sm_scripting,
@@ -456,18 +448,21 @@ if __name__ == "__main__":
 			if plugins:
 				all_plugins += plugins
 	else:
+		bad_folders = [
+			"package",
+			"scripts",
+			"server",
+			"thirdparty",
+			"tmp",
+		]
+		
 		for folder in cwd.glob("*"):
 			if folder.is_file():
 				continue
 			folder_str = str(folder)
-			if folder_str == os.path.join(cwd,"package"):
-				continue
-			if folder_str == os.path.join(cwd,"scripts"):
-				continue
-			if folder_str == os.path.join(cwd,"thirdparty"):
-				continue
-			if folder_str == os.path.join(cwd,"tmp"):
-				continue
+			for bad in bad_folders:
+				if folder_str == os.path.join(cwd,bad):
+					continue
 			if folder_str == pak:
 				continue
 			plugins = handle_plugin(folder)

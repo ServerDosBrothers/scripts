@@ -1,0 +1,48 @@
+diff --git a/AMBuildScript b/AMBuildScript
+index 839b733..4b3ad72 100644
+--- a/AMBuildScript
++++ b/AMBuildScript
+@@ -267,6 +267,9 @@ class SteamWorksConfig(object):
+       os.path.join(self.sm_root, 'public'),
+       os.path.join(self.sm_root, 'public', 'extensions'),
+       os.path.join(self.sm_root, 'public', 'sourcepawn'),
++      os.path.join(self.sm_root, 'public', 'amtl'),
++      os.path.join(self.sm_root, 'public', 'amtl', 'amtl'),
++      os.path.join(self.sm_root, 'sourcepawn', 'include'),
+     ]
+     return compiler
+ 	
+diff --git a/Extension/gsnatives.cpp b/Extension/gsnatives.cpp
+index 73e65f6..e38415b 100644
+--- a/Extension/gsnatives.cpp
++++ b/Extension/gsnatives.cpp
+@@ -59,7 +59,7 @@ static cell_t sm_GetPublicIP(IPluginContext *pContext, const cell_t *params)
+ 		return 0;
+ 	}
+ 	
+-	uint32_t ipaddr = pServer->GetPublicIP();
++	uint32_t ipaddr = pServer->GetPublicIP().m_unIPv4;
+ 	
+ 	cell_t *addr;
+ 	pContext->LocalToPhysAddr(params[1], &addr);
+@@ -80,7 +80,7 @@ static cell_t sm_GetPublicIPCell(IPluginContext *pContext, const cell_t *params)
+ 		return 0;
+ 	}
+ 
+-	return pServer->GetPublicIP();
++	return pServer->GetPublicIP().m_unIPv4;
+ }
+ 
+ static cell_t sm_IsLoaded(IPluginContext *pContext, const cell_t *params)
+diff --git a/Extension/swgameserver.cpp b/Extension/swgameserver.cpp
+index aa66b35..0f64006 100644
+--- a/Extension/swgameserver.cpp
++++ b/Extension/swgameserver.cpp
+@@ -61,6 +61,7 @@ void SteamWorksGameServer::Reset(void)
+ 
+ ISteamClient *SteamWorksGameServer::GetSteamClient(void)
+ {
++	ISteamClient *g_pSteamClientGameServer = SteamGameServerClient();
+ 	if (g_pSteamClientGameServer != NULL)
+ 		return g_pSteamClientGameServer;
+ 

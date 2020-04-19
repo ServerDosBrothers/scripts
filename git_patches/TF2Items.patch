@@ -1,0 +1,49 @@
+diff --git a/AMBuildScript b/AMBuildScript
+index 53e0245..750d9df 100644
+--- a/AMBuildScript
++++ b/AMBuildScript
+@@ -16,9 +16,9 @@ class ExtractDebugInfoCommand(Command):
+ 			return
+ 
+ 		if AMBuild.target['platform'] == 'linux':
+-			job.AddCommand(ShellCommand('objcopy --only-keep-debug ' + self.outfile + ' ' + self.outfile + '.dbg'))
+-			job.AddCommand(ShellCommand('objcopy --strip-debug ' + self.outfile))
+-			job.AddCommand(ShellCommand('objcopy --add-gnu-debuglink=' + os.path.basename(self.outfile) + '.dbg ' + self.outfile))
++			job.AddCommand(ShellCommand('objcopy --only-keep-debug "' + self.outfile + '" "' + self.outfile + '.dbg"'))
++			job.AddCommand(ShellCommand('objcopy --strip-debug "' + self.outfile + '"'))
++			job.AddCommand(ShellCommand('objcopy --add-gnu-debuglink="' + os.path.basename(self.outfile) + '.dbg" "' + self.outfile + '"'))
+ 		elif AMBuild.target['platform'] == 'darwin':
+ 			job.AddCommand(ShellCommand('dsymutil ' + self.outfile))
+ 			job.AddCommand(ShellCommand('strip -S ' + self.outfile))
+@@ -238,7 +238,7 @@ class SM:
+ 			self.compiler.AddToListVar('CDEFINES', 'NO_HOOK_MALLOC')
+ 			self.compiler.AddToListVar('CDEFINES', 'NO_MALLOC_OVERRIDE')
+ 			self.compiler.AddToListVar('CDEFINES', 'SOURCEMOD_BUILD')
+-			self.compiler.AddToListVar('CDEFINES', 'SM_GENERATED_BUILD')
++			#self.compiler.AddToListVar('CDEFINES', 'SM_GENERATED_BUILD')
+ 			self.compiler.AddToListVar('CINCLUDES',
+ 			                           os.path.join(AMBuild.outputFolder, 'includes'))
+ 			self.compiler.ToConfig(AMBuild, 'compiler')
+@@ -416,7 +416,7 @@ globals = {
+ 	'SM': sm
+ }
+ 
+-AMBuild.Include(os.path.join('buildbot', 'Versioning'), globals)
++#AMBuild.Include(os.path.join('buildbot', 'Versioning'), globals)
+ 
+ FileList = [
+ 		['extension', 'AMBuilder'],
+diff --git a/extension/AMBuilder b/extension/AMBuilder
+index d7ab2f1..e75f626 100644
+--- a/extension/AMBuilder
++++ b/extension/AMBuilder
+@@ -13,6 +13,9 @@ for i in SM.sdkInfo:
+ 	
+ 	compiler['CXXINCLUDES'].append(os.path.join(AMBuild.cache['SOURCEMOD14'], 'public'))
+ 	compiler['CXXINCLUDES'].append(os.path.join(AMBuild.cache['SOURCEMOD14'], 'public', 'sourcepawn'))
++	compiler['CXXINCLUDES'].append(os.path.join(AMBuild.cache['SOURCEMOD14'], 'public', 'amtl'))
++	compiler['CXXINCLUDES'].append(os.path.join(AMBuild.cache['SOURCEMOD14'], 'public', 'amtl', 'amtl'))
++	compiler['CXXINCLUDES'].append(os.path.join(AMBuild.cache['SOURCEMOD14'], 'sourcepawn', 'include'))
+ 
+ 	if compiler.cc.name == 'gcc':
+ 		compiler['CFLAGS'].append('-Wno-parentheses')

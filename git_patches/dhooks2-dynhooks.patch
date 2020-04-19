@@ -1,0 +1,20 @@
+diff --git a/AMBuildScript b/AMBuildScript
+index 27473cf..dc33127 100644
+--- a/AMBuildScript
++++ b/AMBuildScript
+@@ -91,7 +91,7 @@ class DHooksConfig(object):
+         '-pipe',
+         '-fno-strict-aliasing',
+         '-Wall',
+-        '-Werror',
++        #'-Werror',
+         '-Wno-unused',
+         '-Wno-switch',
+         '-Wno-format',
+@@ -288,4 +288,4 @@ else:
+ 
+ DHooks.task = builder.Add(program)
+ 
+-builder.RunScript('buildbot/PackageScript', { 'DHooks': DHooks })
+\ No newline at end of file
++builder.RunScript('buildbot/PackageScript', { 'DHooks': DHooks })
