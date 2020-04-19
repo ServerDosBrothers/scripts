@@ -249,16 +249,22 @@ def copy_folder(src, dst):
 			distutils.dir_util.copy_tree(str(folder),newdst)
 
 def get_dep_path(name,rev=False):
-	dep_path = ""
+	dep_path1 = os.path.join(cwd,"server/sources",name)
+	dep_path2 = os.path.join(thirdparty,name)
+	
+	if not os.path.exists(dep_path1) and not os.path.join(dep_path2):
+		return dep_path1
+	
 	if not rev:
-		dep_path = os.path.join(cwd,"server/sources",name)
-		if not os.path.exists(dep_path):
-			dep_path = os.path.join(thirdparty,name)
+		if not os.path.exists(dep_path1):
+			return dep_path2
+		else:
+			return dep_path1
 	else:
-		dep_path = os.path.join(thirdparty,name)
-		if not os.path.exists(dep_path):
-			dep_path = os.path.join(cwd,"server/sources",name)
-	return dep_path
+		if not os.path.exists(dep_path2):
+			return dep_path1
+		else:
+			return dep_path2
 
 def handle_depends_include(depends, extra_includes):
 	for depend in depends:
