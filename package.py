@@ -248,28 +248,36 @@ def copy_folder(src, dst):
 			#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
 			distutils.dir_util.copy_tree(str(folder),newdst)
 
-def handle_depends(depends, extra_includes, compile_later):
+def get_dep_path(name,rev=False):
+	dep_path = ""
+	if not rev:
+		dep_path = os.path.join(cwd,"server/sources",name)
+		if not os.path.exists(dep_path):
+			dep_path = os.path.join(thirdparty,name)
+	else:
+		dep_path = os.path.join(thirdparty,name)
+		if not os.path.exists(dep_path):
+			dep_path = os.path.join(cwd,"server/sources",name)
+	return dep_path
+
+def handle_depends_include(depends, extra_includes):
 	for depend in depends:
 		is_root_repo = True
 		if sp_pak_type:
 			if depend in sp_pak_type:
 				dep = sp_pak_type[depend]
-				type = dep["type"]
-				dep_path = os.path.join(cwd,"server/sources",depend)
-				if not os.path.exists(dep_path):
-					dep_path = os.path.join(thirdparty,depend)
+				dep_path = get_dep_path(depend)
 				is_root_repo = False
 				url = dep["url"]
-				if type == "wget":
-					clone.handle_wget(url, dep_path)
-					extra_includes += [dep_path]
-				elif type == "git":
+				if "git" in url:
 					clone.clone(url, dep_path)
 					if "path_map" in dep:
 						path_map = dep["path_map"]
 						if "addons/sourcemod/scripting/include" in path_map:
 							extra_includes += [os.path.join(dep_path, path_map["addons/sourcemod/scripting/include"])]
-					compile_later += [(dep,dep_path)]
+				else:
+					clone.handle_wget(url, dep_path)
+					extra_includes += [dep_path]
 		if is_root_repo:
 			extra_includes += [os.path.join(cwd,depend,"addons/sourcemod/scripting/include")]
 
@@ -305,7 +313,7 @@ def handle_plugin(folder):
 			with open(sp_pak_info_path,"r") as file:
 				sp_pak_info = json.load(file)
 				if "depends" in sp_pak_info:
-					handle_depends(sp_pak_info["depends"], extra_includes, compile_later)
+					handle_depends_include(sp_pak_info["depends"], extra_includes)
 		
 		plugins = handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, folder, sp_pak_info)
 		if plugins:
@@ -339,49 +347,52 @@ def handle_plugin(folder):
 			return plugins
 	return None
 
-def handle_compile_later(compile_later):
-	compile_later2 = []
-	all_plugins2 = []
+def handle_depend_plugin(dep,name):
+	extra_includes = []
+	sp_pak_info = None
 	
-	for dep, dep_path in compile_later:
-		extra_includes = []
-		sp_pak_info = None
-		
-		path_map = None
-		if "path_map" in dep:
-			path_map = dep["path_map"]
-		
-		if path_map:
-			if "addons/sourcemod/plugins" in path_map:
-				folder = os.path.join(dep_path,path_map["addons/sourcemod/plugins"])
-				shutil.rmtree(folder,ignore_errors=True)
-			if copy_pak:
-				if "copy" in path_map:
-					for key, value in path_map["copy"].items():
-						folder = os.path.join(dep_path,key)
-						target = os.path.join(pak,value)
-						copy_folder(folder, target)
-		
-		if "sp_pak_info" in dep:
-			sp_pak_info = dep["sp_pak_info"]
-			if "depends" in sp_pak_info:
-				handle_depends(sp_pak_info["depends"], extra_includes, compile_later2)
-				
-		if path_map:
-			if "addons/sourcemod/scripting" in path_map:
-				plugins = handle_sp_folder(os.path.join(dep_path,path_map["addons/sourcemod/scripting"]), extra_includes, dep_path, sp_pak_info)
+	dep_path = get_dep_path(name)
+	
+	path_map = None
+	if "path_map" in dep:
+		path_map = dep["path_map"]
+	
+	if path_map:
+		if "addons/sourcemod/plugins" in path_map:
+			folder = os.path.join(dep_path,path_map["addons/sourcemod/plugins"])
+			shutil.rmtree(folder,ignore_errors=True)
+		if copy_pak:
+			if "copy" in path_map:
+				for key, value in path_map["copy"].items():
+					folder = os.path.join(dep_path,key)
+					target = os.path.join(pak,value)
+					copy_folder(folder, target)
+	
+	if "sp_pak_info" in dep:
+		sp_pak_info = dep["sp_pak_info"]
+		if "depends" in sp_pak_info:
+			handle_depends_include(sp_pak_info["depends"], extra_includes)
+			
+	if path_map:
+		if "addons/sourcemod/scripting" in path_map:
+			return handle_sp_folder(os.path.join(dep_path,path_map["addons/sourcemod/scripting"]), extra_includes, dep_path, sp_pak_info)
+	return None
+
+def handle_depends_plugin(deps=None):
+	all_plugins2 = []
+	if deps:
+		for name in deps:
+			if name in sp_pak_type:
+				plugins = handle_depend_plugin(sp_pak_type[name],name)
 				if plugins:
 					all_plugins2 += plugins
-				
-	if compile_later2:
-		plugins2 = handle_compile_later(compile_later2)
-		if plugins2:
-			all_plugins2 += plugins2
-			
-	if all_plugins2:
-		return all_plugins2
 	else:
-		return None
+		for name in sp_pak_type:
+			dep = sp_pak_type[name]
+			plugins = handle_depend_plugin(dep,name)
+			if plugins:
+					all_plugins2 += plugins
+	return all_plugins2
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -438,15 +449,21 @@ if __name__ == "__main__":
 		with open(sp_pak_type_path,"r") as file:
 			sp_pak_type = json.load(file)
 
-	compile_later = []
 	all_plugins = []
 
 	if args.plu:
 		for folder in args.plu:
-			folder = os.path.join(cwd,folder)
-			plugins = handle_plugin(folder)
-			if plugins:
-				all_plugins += plugins
+			name = folder
+			folder = os.path.join(cwd,name)
+			if os.path.exists(folder):
+				plugins = handle_plugin(folder)
+				if plugins:
+					all_plugins += plugins
+			else:
+				if name in sp_pak_type:
+					plugins = handle_depend_plugin(sp_pak_type[name],name)
+					if plugins:
+						all_plugins += plugins
 	else:
 		bad_folders = [
 			"package",
@@ -455,6 +472,8 @@ if __name__ == "__main__":
 			"thirdparty",
 			"tmp",
 		]
+		
+		handle_depends_plugin()
 		
 		for folder in cwd.glob("*"):
 			if folder.is_file():
@@ -468,12 +487,8 @@ if __name__ == "__main__":
 			plugins = handle_plugin(folder)
 			if plugins:
 				all_plugins += plugins
-		
-	plugins = handle_compile_later(compile_later)
-	if plugins:
-		all_plugins += plugins
 
-	shutil.rmtree(os.path.join(pak,"addons/sourcemod/scripting"),ignore_errors=True)
+	#shutil.rmtree(os.path.join(pak,"addons/sourcemod/scripting"),ignore_errors=True)
 
 	if gen_info:
 		info_str = ""

@@ -1,10 +1,8 @@
 {
 	"morecolors": {
-		"type": "wget",
 		"url": "https://www.doctormckay.com/download/scripting/include/morecolors.inc"
 	},
 	"Multi-Colors": {
-		"type": "git",
 		"url": "https://github.com/Bara/Multi-Colors.git",
 		"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include",
 		"addons/sourcemod/scripting": "addons/sourcemod/scripting",
@@ -18,7 +16,6 @@
 		}
 	},
 	"colorlib-sm": {
-		"type": "git",
 		"url": "https://github.com/c0rp3n/colorlib-sm.git",
 		"sp_pak_info": {
 			"depends": [
@@ -40,7 +37,6 @@
 		}
 	},
 	"AutoExecConfig": {
-		"type": "git",
 		"url": "https://github.com/Impact123/AutoExecConfig.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": ".",
@@ -48,28 +44,24 @@
 		}
 	},
 	"sm-ripext": {
-		"type": "git",
 		"url": "https://github.com/ErikMinekus/sm-ripext.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "pawn/scripting/include"
 		}
 	},
 	"stocksoup": {
-		"type": "git",
 		"url": "https://github.com/nosoop/stocksoup.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": ".."
 		}
 	},
 	"TF2Items": {
-		"type": "git",
 		"url": "https://github.com/asherkin/TF2Items.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "pawn"
 		}
 	},
 	"dhooks2-dynhooks": {
-		"type": "git",
 		"url": "https://github.com/PerfectLaugh/dhooks2-dynhooks.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "sourcemod/scripting/include"
@@ -79,7 +71,6 @@
 		}
 	},
 	"SteamWorks": {
-		"type": "git",
 		"url": "https://github.com/KyleSanderson/SteamWorks.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "Pawn/includes"

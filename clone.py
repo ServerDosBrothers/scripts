@@ -36,8 +36,6 @@ if __name__ == "__main__":
 	with requests.get(api_url, auth=(args.user,args.toke)) as request:
 		json_response = json.loads(request.text)
 		
-		#print(json.dumps(json_response, indent=4, sort_keys=True))
-		
 		if isinstance(json_response, dict):
 			json_response = [json_response]
 		for repo_entry in json_response:
@@ -53,10 +51,9 @@ if __name__ == "__main__":
 			sp_pak_type = json.load(file)
 			for name in sp_pak_type:
 				dep = sp_pak_type[name]
-				type = dep["type"]
 				url = dep["url"]
-				dep_path = os.path.join(package.thirdparty,name)
-				if type == "wget":
-					handle_wget(url, dep_path)
-				elif type == "git":
+				dep_path = get_dep_path(name,True)
+				if ".git" in url:
 					clone(url, dep_path)
+				else:
+					handle_wget(url, dep_path)
