@@ -1,4 +1,4 @@
-import os, sys, argparse, pathlib, subprocess, clone, package
+import os, sys, argparse, pathlib, subprocess, clone, package, shutil
 
 cwd = pathlib.Path(os.getcwd())
 
@@ -162,7 +162,7 @@ def handle_exts(exts):
 	for ext in exts:
 		handle_ext(ext)
 
-def handle_plugins(plugins):
+def handle_plugins(plugins, tmp_dir):
 	sourcemod_dir = os.path.join(game,"addons/sourcemod")
 	
 	plugins_str=""
@@ -178,8 +178,21 @@ def handle_plugins(plugins):
 		defines_str += define + ' '
 	
 	os.chdir(cwd)
-	exec = "python \"scripts/package.py\" -s \"" + sourcemod_dir + "\" -f \"" + game + "\" -p " + plugins_str + " -d " + defines_str
+	tmp_dir = os.path.join(serv,"tmp")
+	os.makedirs(tmp_dir,exist_ok=True)
+	extra_args = ""
+	if args.upd:
+		extra_args += "-u "
+	exec = "python \"scripts/package.py\" -s \"" + sourcemod_dir + "\" -o \"" + tmp_dir + "\" -p " + plugins_str + " -d " + defines_str + ' ' + extra_args
 	subprocess.run(exec,shell=True,cwd=os.getcwd())
+
+def remove_if_empty(folder, later):
+	folder = pathlib.Path(folder)
+	if not os.listdir(folder):
+		parent = folder.parent
+		later.append(folder)
+		#shutil.rmtree(folder,ignore_errors=True)
+		remove_if_empty(parent, later)
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -189,6 +202,8 @@ if __name__ == "__main__":
 	parser.add_argument("-d", action="store_true",required=False, dest="deb")
 	parser.add_argument("-f", action="store_true",required=False, dest="fst")
 	parser.add_argument("-i", action="store_true",required=False, dest="ins")
+	parser.add_argument("-c", action="store_true",required=False, dest="cus")
+	parser.add_argument("-u", action="store_true",required=False, dest="upd")
 	args = parser.parse_args()
 	
 	all_exts = False
@@ -229,37 +244,54 @@ if __name__ == "__main__":
 	
 	debug = args.deb
 	
+	tmp_dir = os.path.join(serv,"tmp")
+	
 	if args.ext is not None:
 		handle_exts(args.ext)
 	if args.plu is not None:
-		handle_plugins(args.plu)
+		handle_plugins(args.plu, tmp_dir)
 
-	if args.fst:
-		fastdl = os.path.join(serv,"fastdl")
-		game = pathlib.Path(game)
-		folders = [
-			"models",
-			"maps",
-			"materials",
-			"sound",
-			"scripts",
-		]
-		for folder in folders:
-			path = os.path.join(folder, "**/*")
-			for file in game.glob(path):
-				if not file.is_file():
-					continue
+	remove_later = []
+
+	fastdl = os.path.join(serv,"fastdl")
+	tmp_dir = pathlib.Path(tmp_dir)
+	folders = [
+		"models",
+		"maps",
+		"materials",
+		"sound",
+		"scripts",
+	]
+	for folder in folders:
+		path = os.path.join(folder, "**/*")
+		for file in tmp_dir.glob(path):
+			if not file.is_file():
+				continue
+			if args.fst:
 				exec = "bzip2 \"" + str(file) + "\" -k --best -f -z"
 				subprocess.run(exec,shell=True,cwd=os.getcwd())
 				oldpath = str(file)
 				oldpath += ".bz2"
-				newpath = str(file).replace(str(game),"")
+				newpath = str(file).replace(str(tmp_dir),"")
 				newpath = newpath[1:]
 				print(newpath)
 				newpath = os.path.join(fastdl, newpath)
 				newpath += ".bz2"
 				os.makedirs(pathlib.Path(newpath).parent,exist_ok=True)
 				os.rename(oldpath,newpath)
+			if args.cus:
+				newpath = str(file).replace(str(tmp_dir),"")
+				newpath = newpath[1:]
+				newpath = os.path.join(game,"custom/content",newpath)
+				os.makedirs(pathlib.Path(newpath).parent,exist_ok=True)
+				os.rename(file,newpath)
+				remove_if_empty(file.parent, remove_later)
+
+	for folder in remove_later:
+		shutil.rmtree(folder,ignore_errors=True)
+
+	package.copy_folder(tmp_dir,game)
+	shutil.rmtree(tmp_dir,ignore_errors=True)
 
 	if args.ins:
-		subprocess.run(steamcmd_sh + " +login anonymous +force_install_dir \"" + install_dir + "\" +app_update 232250 +quit",shell=True,cwd=os.getcwd())
+		subprocess.run("\"" + steamcmd_sh + "\" +login anonymous +force_install_dir \"" + install_dir + "\" +app_update 232250 +quit",shell=True,cwd=os.getcwd())
