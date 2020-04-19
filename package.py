@@ -2,19 +2,6 @@ import re, os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_u
 
 cwd = pathlib.Path(os.getcwd())
 
-remove_tmp = True
-remove_pak = False
-copy_pak = True
-copy_game = False
-gen_info = True
-
-pak = os.path.join(cwd,"package")
-pak_sm = os.path.join(pak,"addons/sourcemod")
-pak_scripting = os.path.join(pak_sm,"scripting")
-pak_include = os.path.join(pak_scripting,"include")
-pak_plugins = os.path.join(pak_sm,"plugins")
-pak_gamedata = os.path.join(pak_sm,"gamedata")
-
 tmp_dir = os.path.join(cwd,"tmp")
 thirdparty = os.path.join(cwd,"thirdparty")
 sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type")
@@ -151,9 +138,9 @@ def replace_version(code, gitfolder, commit, plugin):
 			plugin["version"] = tpstr
 	return code
 
-def handle_sp_folder(folder, extra_includes, sp_pak_info):
+def handle_sp_folder(folder, extra_includes, gitfolder, sp_pak_info):
 	folder = pathlib.Path(folder)
-	gitfolder = os.path.basename(os.getcwd())
+	gitname = os.path.basename(gitfolder)
 	plugins = []
 	for file in folder.glob("*.sp"):
 		file_basename = os.path.basename(file)
@@ -162,7 +149,7 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info):
 				if file_basename in sp_pak_info["ignore_plugins"]:
 					continue
 		plugin = {}
-		print("Compiling " + file_basename + " from " + gitfolder)
+		print("Compiling " + file_basename + " from " + gitname)
 		code = ""
 		newfile_path = os.path.join(tmp_dir,file_basename)
 		file_basename = os.path.splitext(file_basename)[0]
@@ -172,7 +159,9 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info):
 		with open(file,"r") as newfile:
 			code = newfile.read()
 		commit = ""
-		if os.path.exists(os.path.join(os.getcwd(), ".git")):
+		if os.path.exists(os.path.join(gitfolder, ".git")):
+			old_cwd = os.getcwd()
+			os.chdir(gitfolder)
 			commit = subprocess.check_output("git rev-parse HEAD", shell=True,cwd=os.getcwd())
 			commit = commit[:-1]
 			commit = commit.decode("utf-8")
@@ -180,11 +169,12 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info):
 			note = note[:-1]
 			note = note.decode("utf-8")
 			plugin["note"] = note
+			os.chdir(old_cwd)
 		else:
 			commit = "Unknown"
-		code = replace_version(code, gitfolder, commit, plugin)
+		code = replace_version(code, gitname, commit, plugin)
 		update_url = os.path.join(base_update_url, file_basename + ".txt") + post_update_url
-		code = replace_updateurl(code, gitfolder, plugin, update_url)
+		code = replace_updateurl(code, gitname, plugin, update_url)
 		with open(newfile_path,"w") as newfile:
 			newfile.write(code)
 		file_folder = file.parent
@@ -198,7 +188,7 @@ def handle_sp_folder(folder, extra_includes, sp_pak_info):
 		for inc in includes:
 			includes_str += "-i \"" + str(inc) + "\" "
 		extra_path = ""
-		if "SVB-" in gitfolder:
+		if "SVB-" in gitname:
 			extra_path = os.path.join(extra_path,"svb")
 		else:
 			extra_path = os.path.join(extra_path,"thirdparty")
@@ -295,8 +285,6 @@ def handle_plugin(folder):
 	folder = pathlib.Path(folder)
 	addons = os.path.join(folder,"addons")
 	if os.path.exists(addons):
-		os.chdir(folder)
-		
 		if copy_pak:
 			copy_folder(folder, pak)
 		
@@ -327,7 +315,7 @@ def handle_plugin(folder):
 				if "depends" in sp_pak_info:
 					handle_depends(sp_pak_info["depends"], extra_includes, compile_later)
 		
-		plugins = handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, sp_pak_info)
+		plugins = handle_sp_folder(os.path.join(addons,"sourcemod/scripting"), extra_includes, folder, sp_pak_info)
 		if plugins:
 			for plugin in plugins:
 				if "update_url" in plugin:
@@ -367,8 +355,6 @@ def handle_compile_later(compile_later):
 		extra_includes = []
 		sp_pak_info = None
 		
-		os.chdir(dep_path)
-		
 		path_map = None
 		if "path_map" in dep:
 			path_map = dep["path_map"]
@@ -391,7 +377,7 @@ def handle_compile_later(compile_later):
 				
 		if path_map:
 			if "addons/sourcemod/scripting" in path_map:
-				plugins = handle_sp_folder(os.path.join(dep_path,path_map["addons/sourcemod/scripting"]), extra_includes, sp_pak_info)
+				plugins = handle_sp_folder(os.path.join(dep_path,path_map["addons/sourcemod/scripting"]), extra_includes, dep_path, sp_pak_info)
 				if plugins:
 					all_plugins2 += plugins
 				
@@ -410,7 +396,25 @@ if __name__ == "__main__":
 	parser.add_argument("-s", action="store", required=True, dest="sm")
 	parser.add_argument("-d", action="store",nargs="*",required=False, dest="defi")
 	parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
+	parser.add_argument("-f", action="store",default=os.path.join(cwd,"package"),required=False, dest="fldr")
 	args = parser.parse_args()
+	
+	pak = args.fldr
+	pak = os.path.abspath(pak)
+	os.makedirs(pak,exist_ok=True)
+	pak_sm = os.path.join(pak,"addons/sourcemod")
+	pak_scripting = os.path.join(pak_sm,"scripting")
+	pak_include = os.path.join(pak_scripting,"include")
+	pak_plugins = os.path.join(pak_sm,"plugins")
+	pak_gamedata = os.path.join(pak_sm,"gamedata")
+	
+	os.chdir(pak)
+	
+	remove_tmp = True
+	remove_pak = False
+	copy_pak = True
+	gen_info = False
+	copy_game = False
 	
 	sm_scripting = os.path.join(args.sm,"scripting")
 	sm_include = os.path.join(sm_scripting,"include")
@@ -428,6 +432,8 @@ if __name__ == "__main__":
 	defines = ""
 	if args.defi:
 		for d in args.defi:
+			if d[:-1] != '=':
+				d += '='
 			defines += d + ' '
 	
 	os.makedirs(thirdparty,exist_ok=True)
@@ -453,9 +459,16 @@ if __name__ == "__main__":
 		for folder in cwd.glob("*"):
 			if folder.is_file():
 				continue
-			if folder == "package":
+			folder_str = str(folder)
+			if folder_str == os.path.join(cwd,"package"):
 				continue
-			if folder == "scripts":
+			if folder_str == os.path.join(cwd,"scripts"):
+				continue
+			if folder_str == os.path.join(cwd,"thirdparty"):
+				continue
+			if folder_str == os.path.join(cwd,"tmp"):
+				continue
+			if folder_str == pak:
 				continue
 			plugins = handle_plugin(folder)
 			if plugins:
