@@ -30,7 +30,11 @@ def clone_repo(repo):
 		name = repo[2]
 	if len(repo) >= 2:
 		branch = repo[1]
-	path = os.path.join(sources,name)
+	path = ""
+	if "SVB-" in name:
+		path = os.path.join(cwd,name)
+	else:
+		path = os.path.join(sources,name)
 	clone.clone(url,path,branch)
 
 def handle_ext(ext):
@@ -62,6 +66,10 @@ def handle_ext(ext):
 		repo = ("https://github.com/asherkin/TF2Items.git",)
 	elif ext == "dhooks2-dynhooks":
 		repo = ("https://github.com/PerfectLaugh/dhooks2-dynhooks.git",)
+	elif ext == "SVB-RandomMap":
+		repo = ("https://github.com/ServerDosBrothers/SVB-RandomMap.git",)
+	elif ext == "SVB-Telephone":
+		repo = ("https://github.com/ServerDosBrothers/SVB-Telephone.git",)
 	
 	if repo is None:
 		return
@@ -104,6 +112,7 @@ def handle_ext(ext):
 	base_args = optimize_flag + " --sdks=tf2 --hl2sdk-root=\"" + sources + "\" "
 	base_args_ext = base_args + "--mms-path=\"" + mmsource_src_dir + "\" --sm-path=\"" + sourcemod_src_dir + "\" "
 	base_args_ext_nogame = optimize_flag + " --mms-path=\"" + mmsource_src_dir + "\" --sm-path=\"" + sourcemod_src_dir + "\" "
+	base_args_ext_nogame_nometa = optimize_flag + " --sm-path=\"" + sourcemod_src_dir + "\""
 
 	if ext == "sourcemod":
 		os.chdir(sourcemod_src_dir)
@@ -139,6 +148,16 @@ def handle_ext(ext):
 		os.chdir(dhooks_src_dir)
 		build_ambuild2(base_args_ext_nogame)
 		package.copy_folder(os.path.join(dhooks_src_dir,"build/package"),game)
+	elif ext == "SVB-RandomMap":
+		random_src_dir = os.path.join(cwd,"SVB-RandomMap")
+		os.chdir(random_src_dir)
+		build_ambuild2(base_args)
+		package.copy_folder(os.path.join(random_src_dir,"build/package"),game)
+	elif ext == "SVB-Telephone":
+		telephone_src_dir = os.path.join(sources,"SVB-Telephone")
+		os.chdir(telephone_src_dir)
+		build_ambuild2(base_args_ext_nogame_nometa)
+		package.copy_folder(os.path.join(telephone_src_dir,"build/package"),game)
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
@@ -157,6 +176,8 @@ def handle_exts(exts):
 			"TF2Items",
 			"SteamWorks",
 			"dhooks2-dynhooks",
+			"SVB-RandomMap",
+			"SVB-Telephone",
 		]
 	
 	for ext in exts:
