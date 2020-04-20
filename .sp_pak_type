@@ -38,6 +38,11 @@
 	},
 	"AutoExecConfig": {
 		"url": "https://github.com/Impact123/AutoExecConfig.git",
+		"sp_pak_info": {
+			"ignore_plugins": [
+				"autoexecconfig.sp"
+			]
+		},
 		"path_map": {
 			"addons/sourcemod/scripting/include": ".",
 			"addons/sourcemod/scripting": "."

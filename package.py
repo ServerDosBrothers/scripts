@@ -401,6 +401,15 @@ def handle_depends_plugin(deps=None):
 					all_plugins2 += plugins
 	return all_plugins2
 
+bad_folders = [
+	"package",
+	"scripts",
+	"server",
+	"thirdparty",
+	"vscode",
+	"tmp",
+]
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-s", action="store", required=True, dest="sm")
@@ -473,14 +482,6 @@ if __name__ == "__main__":
 					if plugins:
 						all_plugins += plugins
 	else:
-		bad_folders = [
-			"package",
-			"scripts",
-			"server",
-			"thirdparty",
-			"tmp",
-		]
-		
 		handle_depends_plugin()
 		
 		for folder in cwd.glob("*"):
