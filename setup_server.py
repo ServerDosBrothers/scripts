@@ -295,7 +295,7 @@ if __name__ == "__main__":
 				oldpath += ".bz2"
 				newpath = str(file).replace(str(tmp_dir),"")
 				newpath = newpath[1:]
-				print(newpath)
+				#print(newpath)
 				newpath = os.path.join(fastdl, newpath)
 				newpath += ".bz2"
 				os.makedirs(pathlib.Path(newpath).parent,exist_ok=True)
