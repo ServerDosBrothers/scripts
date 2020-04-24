@@ -275,8 +275,11 @@ def handle_depends_include(depends, extra_includes):
 				dep_path = get_dep_path(depend)
 				is_root_repo = False
 				url = dep["url"]
+				branch = "master"
+				if "branch" in dep:
+					branch = dep["branch"]
 				if "git" in url:
-					clone.clone(url, dep_path)
+					clone.clone(url, dep_path, branch)
 					if "path_map" in dep:
 						path_map = dep["path_map"]
 						if "addons/sourcemod/scripting/include" in path_map:

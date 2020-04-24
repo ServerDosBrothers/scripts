@@ -68,6 +68,7 @@
 	},
 	"DHooks2": {
 		"url": "https://github.com/peace-maker/DHooks2.git",
+		"branch": "dynhooks",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "sourcemod/scripting/include"
 		},

@@ -1,5 +1,5 @@
 diff --git a/AMBuildScript b/AMBuildScript
-index 27473cf..dc33127 100644
+index 80e519e..0e77fdf 100644
 --- a/AMBuildScript
 +++ b/AMBuildScript
 @@ -91,7 +91,7 @@ class DHooksConfig(object):
@@ -11,7 +11,7 @@ index 27473cf..dc33127 100644
          '-Wno-unused',
          '-Wno-switch',
          '-Wno-format',
-@@ -288,4 +288,4 @@ else:
+@@ -289,4 +289,4 @@ else:
  
  DHooks.task = builder.Add(program)
  

@@ -65,7 +65,7 @@ def handle_ext(ext):
 	elif ext == "TF2Items":
 		repo = ("https://github.com/asherkin/TF2Items.git",)
 	elif ext == "DHooks2":
-		repo = ("https://github.com/peace-maker/DHooks2.git",)
+		repo = ("https://github.com/peace-maker/DHooks2.git","dynhooks",)
 	elif ext == "SVB-RandomMap":
 		repo = ("https://github.com/ServerDosBrothers/SVB-RandomMap.git",)
 	elif ext == "SVB-Telephone":
