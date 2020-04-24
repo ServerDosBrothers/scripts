@@ -6123,6 +6123,27 @@ zcnC+iJ^(m_13~i5-|cvqFX09OHy8kiDC@^~*k^>Jd>sN@E)tRs_(xo9>ud2Ce8Z4(
 z!>?qwA7LMI!Aa|2oiTNk`6CP;ObI&pD9iHz*K2?@41fL-5A&D$0&W0s(~f71`Xes>
 kJ%NYio5LUYBOInboj=Bzhq%n&Wq%4;+)QQu2*bbs2i<q6Q~&?~
 
+diff --git a/addons/sourcemod/scripting/include/sendproxy.inc b/addons/sourcemod/scripting/include/sendproxy.inc
+index 862d613..effb74f 100644
+--- a/addons/sourcemod/scripting/include/sendproxy.inc
++++ b/addons/sourcemod/scripting/include/sendproxy.inc
+@@ -76,6 +76,9 @@ native bool SendProxy_IsPropChangeArrayHookedGameRules(const char[] cPropName, c
+ native void SendProxy_UnhookPropChangeArray(const int iEntity, const char[] cPropName, const int iElement, const PropChangedCallback pCallback);
+ native void SendProxy_UnhookPropChangeArrayGameRules(const char[] cPropName, const int iElement, const PropChangedCallback pCallback);
+ 
++native void SendProxy_UnhookPropChange(const int iEntity, const char[] cPropName, const PropChangedCallback pCallback);
++native void SendProxy_UnhookPropChangeGameRules(const char[] cPropName, const GameRulesPropChangedCallback pCallback);
++
+ #if !defined REQUIRE_EXTENSIONS
+ public __ext_sendproxymanager_SetNTVOptional()
+ {
+@@ -124,4 +127,4 @@ public Extension __ext_sendproxymanager =
+ #endif
+ };
+ 
+-#endif
+\ No newline at end of file
++#endif
 diff --git a/extension/AMBuildScript b/extension/AMBuildScript
 index 6e7f5c7..ae40aef 100644
 --- a/extension/AMBuildScript
