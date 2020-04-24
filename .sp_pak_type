@@ -66,8 +66,8 @@
 			"addons/sourcemod/scripting/include": "pawn"
 		}
 	},
-	"dhooks2-dynhooks": {
-		"url": "https://github.com/PerfectLaugh/dhooks2-dynhooks.git",
+	"DHooks2": {
+		"url": "https://github.com/peace-maker/DHooks2.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "sourcemod/scripting/include"
 		},
@@ -79,6 +79,12 @@
 		"url": "https://github.com/KyleSanderson/SteamWorks.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "Pawn/includes"
+		}
+	},
+	"sendproxy": {
+		"url": "https://github.com/TheByKotik/sendproxy.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include"
 		}
 	}
 }

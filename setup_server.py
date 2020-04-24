@@ -64,8 +64,8 @@ def handle_ext(ext):
 		repo = ("https://github.com/ErikMinekus/sm-ripext.git",)
 	elif ext == "TF2Items":
 		repo = ("https://github.com/asherkin/TF2Items.git",)
-	elif ext == "dhooks2-dynhooks":
-		repo = ("https://github.com/PerfectLaugh/dhooks2-dynhooks.git",)
+	elif ext == "DHooks2":
+		repo = ("https://github.com/peace-maker/DHooks2.git",)
 	elif ext == "SVB-RandomMap":
 		repo = ("https://github.com/ServerDosBrothers/SVB-RandomMap.git",)
 	elif ext == "SVB-Telephone":
@@ -143,8 +143,8 @@ def handle_ext(ext):
 		os.chdir(steamworks_src_dir)
 		build_ambuild2(base_args_ext.replace("--sdks=tf2","--sdks=sdk2013"))
 		package.copy_folder(os.path.join(steamworks_src_dir,"build/package"),game)
-	elif ext == "dhooks2-dynhooks":
-		dhooks_src_dir = os.path.join(sources,"dhooks2-dynhooks")
+	elif ext == "DHooks2":
+		dhooks_src_dir = os.path.join(sources,"DHooks2")
 		os.chdir(dhooks_src_dir)
 		build_ambuild2(base_args_ext_nogame)
 		package.copy_folder(os.path.join(dhooks_src_dir,"build/package"),game)
@@ -175,7 +175,7 @@ def handle_exts(exts):
 			"sm-ripext",
 			"TF2Items",
 			"SteamWorks",
-			"dhooks2-dynhooks",
+			"DHooks2",
 			"SVB-RandomMap",
 			"SVB-Telephone",
 		]
