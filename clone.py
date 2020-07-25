@@ -15,7 +15,7 @@ def clone(url, path, branch="master"):
 		subprocess.run(clone_cmd,shell=True,cwd=os.getcwd())
 	patch_path = os.path.join(cwd,"scripts/git_patches",os.path.basename(path)+".patch")
 	if os.path.exists(patch_path):
-		subprocess.run("git apply \"" + patch_path + "\"",shell=True,cwd=os.getcwd())
+		subprocess.run("git apply --reject --whitespace=fix \"" + patch_path + "\"",shell=True,cwd=os.getcwd())
 	os.chdir(old_cwd)
 
 def handle_wget(url, folder):

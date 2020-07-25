@@ -1,0 +1,87 @@
+diff --git a/Makefile b/Makefile
+index 84d6f20..0a3f342 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,17 +5,7 @@
+ ### EDIT THESE PATHS FOR YOUR OWN SETUP ###
+ ###########################################
+ 
+-SMSDK = ../sourcemod
+-HL2SDK_ORIG = ../hl2sdk-episode1
+-HL2SDK_OB = ../hl2sdk-orangebox
+-HL2SDK_CSS = ../hl2sdk-css
+-HL2SDK_HL2DM = ../hl2sdk-hl2dm
+-HL2SDK_DODS = ../hl2sdk-dods
+-HL2SDK_TF2 = ../hl2sdk-tf2
+-HL2SDK_L4D = ../hl2sdk-l4d
+-HL2SDK_L4D2 = ../hl2sdk-l4d2
+-HL2SDK_CSGO = ../hl2sdk-csgo
+-MMSOURCE = ../mmsource
++
+ 
+ #####################################
+ ### EDIT BELOW FOR OTHER PROJECTS ###
+@@ -87,10 +77,10 @@ endif
+ HL2PUB = $(HL2SDK)/public
+ 
+ ifeq "$(ENGINE)" "original"
+-	INCLUDE += -I$(HL2SDK)/public/dlls
++	INCLUDE += -I"$(HL2SDK)/public/dlls"
+ 	METAMOD = $(MMSOURCE)/core-legacy
+ else
+-	INCLUDE += -I$(HL2SDK)/public/game/server
++	INCLUDE += -I"$(HL2SDK)/public/game/server"
+ 	METAMOD = $(MMSOURCE)/core
+ endif
+ 
+@@ -124,18 +114,18 @@ else
+ 	endif
+ endif
+ 
+-INCLUDE += -I. -I.. -I$(SMSDK)/public -I$(SMSDK)/public/amtl -I$(SMSDK)/public/amtl/amtl -I$(SMSDK)/sourcepawn/include
++INCLUDE += -I. -I.. -I"$(SMSDK)/public" -I"$(SMSDK)/public/amtl" -I"$(SMSDK)/public/amtl/amtl" -I"$(SMSDK)/sourcepawn/include"
+ 
+ ifeq "$(USEMETA)" "true"
+-	LINK_HL2 = $(HL2LIB)/tier1_i486.a $(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(LIB_PREFIX)tier0$(LIB_SUFFIX)
++	LINK_HL2 = "$(HL2LIB)/tier1_i486.a" $(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(LIB_PREFIX)tier0$(LIB_SUFFIX)
+ 	ifeq "$(ENGINE)" "csgo"
+-		LINK_HL2 += $(HL2LIB)/interfaces_i486.a -lstdc++
++		LINK_HL2 += "$(HL2LIB)/interfaces_i486.a" -lstdc++
+ 	endif
+ 
+ 	LINK += $(LINK_HL2)
+ 
+-	INCLUDE += -I$(HL2PUB) -I$(HL2PUB)/engine -I$(HL2PUB)/tier0 -I$(HL2PUB)/tier1 -I$(METAMOD) \
+-		-I$(METAMOD)/sourcehook 
++	INCLUDE += -I"$(HL2PUB)" -I"$(HL2PUB)/engine" -I"$(HL2PUB)/tier0" -I"$(HL2PUB)/tier1" -I"$(METAMOD)" \
++		-I"$(METAMOD)/sourcehook"
+ 	CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_BLOODYGOODTIME=4 -DSE_EYE=5 \
+ 		-DSE_CSS=6 -DSE_ORANGEBOXVALVE=7 -DSE_LEFT4DEAD=8 -DSE_LEFT4DEAD2=9 -DSE_ALIENSWARM=10 \
+ 		-DSE_PORTAL2=11 -DSE_CSGO=12
+@@ -194,13 +184,13 @@ $(BIN_DIR)/%.o: %.cpp
+ 	$(CPP) $(INCLUDE) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
+ 
+ all: check
+-	ln -sf $(SMSDK)/public/smsdk_ext.cpp
++	ln -sf "$(SMSDK)/public/smsdk_ext.cpp"
+ 	mkdir -p $(BIN_DIR)
+ 	if [ "$(USEMETA)" = "true" ]; then \
+-		ln -sf $(HL2LIB)/$(LIB_PREFIX)vstdlib$(LIB_SUFFIX); \
+-		ln -sf $(HL2LIB)/$(LIB_PREFIX)tier0$(LIB_SUFFIX); \
++		ln -sf "$(HL2LIB)/$(LIB_PREFIX)vstdlib$(LIB_SUFFIX)"; \
++		ln -sf "$(HL2LIB)/$(LIB_PREFIX)tier0$(LIB_SUFFIX)"; \
+ 	fi
+-	$(MAKE) -f $(MAKEFILE_NAME) extension
++	$(MAKE) -f "$(MAKEFILE_NAME)" extension
+ 
+ check:
+ 	if [ "$(USEMETA)" = "true" ] && [ "$(ENGSET)" = "false" ]; then \
+@@ -213,7 +203,7 @@ extension: check $(OBJ_BIN)
+ 	$(CPP) $(INCLUDE) $(OBJ_BIN) $(LINK) -o $(BIN_DIR)/$(BINARY)
+ 
+ debug:
+-	$(MAKE) -f $(MAKEFILE_NAME) all DEBUG=true
++	$(MAKE) -f "$(MAKEFILE_NAME)" all DEBUG=true
+ 
+ default: all
+ 

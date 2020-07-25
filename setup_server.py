@@ -70,6 +70,10 @@ def handle_ext(ext):
 		repo = ("https://github.com/ServerDosBrothers/SVB-RandomMap.git",)
 	elif ext == "SVB-Telephone":
 		repo = ("https://github.com/ServerDosBrothers/SVB-Telephone.git",)
+	elif ext == "FileNetMessages":
+		repo = ("https://github.com/Accelerator74/FileNetMessages.git",)
+	elif ext == "latedl":
+		repo = ("https://github.com/jonatan1024/latedl.git",)
 	
 	if repo is None:
 		return
@@ -84,18 +88,26 @@ def handle_ext(ext):
 	os.environ["SOURCEMOD16"] = sourcemod_src_dir
 	os.environ["SOURCEMOD"] = sourcemod_src_dir
 	os.environ["SMCENTRAL"] = sourcemod_src_dir
+	os.environ["SMSDK"] = sourcemod_src_dir
 	
 	os.environ["MMSOURCE19"] = mmsource_src_dir
 	os.environ["MMSOURCE18"] = mmsource_src_dir
 	os.environ["MMSOURCE10"] = mmsource_src_dir
 	os.environ["MMSOURCE110"] = mmsource_src_dir
 	os.environ["MMSOURCE_DEV"] = mmsource_src_dir
+	os.environ["MMSOURCE"] = mmsource_src_dir
 	
 	os.environ["HL2SDK"] = hl2sdk_dir
+	os.environ["HL2SDK_ORIG"] = hl2sdk_dir
 	os.environ["HL2SDKOB"] = hl2sdk_dir
+	os.environ["HL2SDK_OB"] = hl2sdk_dir
 	os.environ["HL2SDKOBVALVE"] = hl2sdk_dir
+	os.environ["HL2SDK_OB_VALVE"] = hl2sdk_dir
 	os.environ["HL2SDKTF2"] = hl2sdk_dir
+	os.environ["HL2SDK_TF2"] = hl2sdk_dir
 	os.environ["HL2SDK2013"] = hl2sdk_dir
+	
+	os.environ["ENGINE"] = "orangeboxvalve"
 	
 	os.environ["STEAMWORKS"] = os.path.join(steamworks_dir,"sdk")
 	
@@ -158,6 +170,16 @@ def handle_ext(ext):
 		os.chdir(telephone_src_dir)
 		build_ambuild2(base_args_ext_nogame_nometa)
 		package.copy_folder(os.path.join(telephone_src_dir,"build/package"),game)
+	elif ext == "FileNetMessages":
+		filenet_src_dir = os.path.join(sources,"FileNetMessages")
+		os.chdir(filenet_src_dir)
+		subprocess.run("make -j4",shell=True,cwd=os.getcwd())
+		package.copy_folder(os.path.join(filenet_src_dir,"Release.orangeboxvalve/filenetmessages.ext.2.ep2v.so"),os.path.join(game,"addons/sourcemod/extensions"))
+	elif ext == "latedl":
+		latedl_src_dir = os.path.join(sources,"latedl")
+		os.chdir(latedl_src_dir)
+		build_ambuild2(base_args_ext)
+		package.copy_folder(os.path.join(latedl_src_dir,"build/package"),game)
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
@@ -178,6 +200,8 @@ def handle_exts(exts):
 			"DHooks2",
 			"SVB-RandomMap",
 			"SVB-Telephone",
+			"FileNetMessages",
+			"latedl",
 		]
 	
 	for ext in exts:

@@ -11,8 +11,10 @@
 				"multicolors_example.sp"
 			]
 		},
-		"copy": {
-			"addons": "addons"
+		"path_map": {
+			"copy": {
+				"addons": "addons"
+			}
 		}
 	},
 	"colorlib-sm": {
@@ -70,10 +72,10 @@
 		"url": "https://github.com/peace-maker/DHooks2.git",
 		"branch": "dynhooks",
 		"path_map": {
-			"addons/sourcemod/scripting/include": "sourcemod/scripting/include"
-		},
-		"copy": {
-			"sourcemod/gamedata": "addons/sourcemod/gamedata"
+			"addons/sourcemod/scripting/include": "sourcemod/scripting/include",
+			"copy": {
+				"sourcemod/gamedata": "addons/sourcemod/gamedata"
+			}
 		}
 	},
 	"SteamWorks": {
@@ -86,6 +88,20 @@
 		"url": "https://github.com/TheByKotik/sendproxy.git",
 		"path_map": {
 			"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include"
+		}
+	},
+	"FileNetMessages": {
+		"url": "https://github.com/Accelerator74/FileNetMessages.git",
+		"path_map": {
+			"copy": {
+				"filenetmessages.inc": "addons/sourcemod/scripting/include"
+			}
+		}
+	},
+	"latedl": {
+		"url": "https://github.com/jonatan1024/latedl.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "include"
 		}
 	}
 }

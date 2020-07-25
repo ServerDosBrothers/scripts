@@ -237,16 +237,22 @@ def handle_sp_folder(folder, extra_includes, gitfolder, sp_pak_info):
 def copy_folder(src, dst):
 	if os.path.exists(src):
 		src = pathlib.Path(src)
-		for folder in src.glob("*"):
-			base_name = os.path.basename(folder)
-			if base_name == ".git":
-				continue
-			if folder.is_file():
-				continue
+		if src.is_dir():
+			for folder in src.glob("*"):
+				base_name = os.path.basename(folder)
+				if base_name == ".git":
+					continue
+				if folder.is_file():
+					continue
+				newdst = os.path.join(dst,base_name)
+				os.makedirs(newdst,exist_ok=True)
+				#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
+				distutils.dir_util.copy_tree(str(folder),newdst)
+		else:
+			base_name = os.path.basename(src)
 			newdst = os.path.join(dst,base_name)
-			os.makedirs(newdst,exist_ok=True)
-			#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
-			distutils.dir_util.copy_tree(str(folder),newdst)
+			os.makedirs(dst,exist_ok=True)
+			shutil.copyfile(src,newdst)
 
 def get_dep_path(name,rev=False):
 	dep_path1 = os.path.join(cwd,"server/sources",name)
