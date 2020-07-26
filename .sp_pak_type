@@ -103,5 +103,11 @@
 		"path_map": {
 			"addons/sourcemod/scripting/include": "include"
 		}
+	},
+	"System2": {
+		"url": "https://github.com/dordnung/System2.git",
+		"path_map": {
+			"addons/sourcemod": "sourcemod"
+		}
 	}
 }

@@ -10,6 +10,7 @@ def clone(url, path, branch="master"):
 		subprocess.run("git fetch",shell=True,cwd=os.getcwd())
 		subprocess.run("git reset --hard",shell=True,cwd=os.getcwd())
 		subprocess.run("git clean --force -d",shell=True,cwd=os.getcwd())
+		subprocess.run("git pull --rebase",shell=True,cwd=os.getcwd())
 	else:
 		clone_cmd = "git clone --recursive \""+url+"\" \"" + path + "\" --branch=\"" + branch +"\""
 		subprocess.run(clone_cmd,shell=True,cwd=os.getcwd())

@@ -74,6 +74,10 @@ def handle_ext(ext):
 		repo = ("https://github.com/Accelerator74/FileNetMessages.git",)
 	elif ext == "latedl":
 		repo = ("https://github.com/jonatan1024/latedl.git",)
+	elif ext == "SVB-Vtflib":
+		repo = ("https://github.com/ServerDosBrothers/SVB-Vtflib.git",)
+	elif ext == "System2":
+		repo = ("https://github.com/dordnung/System2.git",)
 	
 	if repo is None:
 		return
@@ -166,7 +170,7 @@ def handle_ext(ext):
 		build_ambuild2(base_args)
 		package.copy_folder(os.path.join(random_src_dir,"build/package"),game)
 	elif ext == "SVB-Telephone":
-		telephone_src_dir = os.path.join(sources,"SVB-Telephone")
+		telephone_src_dir = os.path.join(cwd,"SVB-Telephone")
 		os.chdir(telephone_src_dir)
 		build_ambuild2(base_args_ext_nogame_nometa)
 		package.copy_folder(os.path.join(telephone_src_dir,"build/package"),game)
@@ -180,6 +184,13 @@ def handle_ext(ext):
 		os.chdir(latedl_src_dir)
 		build_ambuild2(base_args_ext)
 		package.copy_folder(os.path.join(latedl_src_dir,"build/package"),game)
+	elif ext == "SVB-Vtflib":
+		vtflib_src_dir = os.path.join(cwd,"SVB-Vtflib")
+		os.chdir(vtflib_src_dir)
+		build_ambuild2(base_args_ext)
+		package.copy_folder(os.path.join(vtflib_src_dir,"build/package"),game)
+	elif ext == "System2":
+		pass
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
@@ -202,6 +213,8 @@ def handle_exts(exts):
 			"SVB-Telephone",
 			"FileNetMessages",
 			"latedl",
+			"SVB-Vtflib",
+			"System2",
 		]
 	
 	for ext in exts:
