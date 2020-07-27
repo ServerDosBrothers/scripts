@@ -1,5 +1,5 @@
 diff --git a/AMBuildScript b/AMBuildScript
-index 80e519e..0e77fdf 100644
+index 80e519e..c50a8d4 100644
 --- a/AMBuildScript
 +++ b/AMBuildScript
 @@ -91,7 +91,7 @@ class DHooksConfig(object):
@@ -11,10 +11,3 @@ index 80e519e..0e77fdf 100644
          '-Wno-unused',
          '-Wno-switch',
          '-Wno-format',
-@@ -289,4 +289,4 @@ else:
- 
- DHooks.task = builder.Add(program)
- 
--builder.RunScript('buildbot/PackageScript', { 'DHooks': DHooks })
-\ No newline at end of file
-+builder.RunScript('buildbot/PackageScript', { 'DHooks': DHooks })

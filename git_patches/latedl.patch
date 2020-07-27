@@ -1,8 +1,8 @@
 diff --git a/AMBuildScript b/AMBuildScript
-index 81a117d..2d84a83 100644
+index 81a117d..9787029 100644
 --- a/AMBuildScript
 +++ b/AMBuildScript
-@@ -169,10 +169,11 @@ class ExtensionConfig(object):
+@@ -169,7 +169,7 @@ class ExtensionConfig(object):
        '-pipe',
        '-fno-strict-aliasing',
        '-Wall',
@@ -11,7 +11,3 @@ index 81a117d..2d84a83 100644
        '-Wno-unused',
        '-Wno-switch',
        '-Wno-array-bounds',
-+      '-Wno-class-memaccess',
-       '-msse',
-       '-m32',
-       '-fvisibility=hidden',

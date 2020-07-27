@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 84d6f20..0a3f342 100644
+index 84d6f20..71ba85a 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -5,17 +5,7 @@
@@ -54,7 +54,7 @@ index 84d6f20..0a3f342 100644
 -	INCLUDE += -I$(HL2PUB) -I$(HL2PUB)/engine -I$(HL2PUB)/tier0 -I$(HL2PUB)/tier1 -I$(METAMOD) \
 -		-I$(METAMOD)/sourcehook 
 +	INCLUDE += -I"$(HL2PUB)" -I"$(HL2PUB)/engine" -I"$(HL2PUB)/tier0" -I"$(HL2PUB)/tier1" -I"$(METAMOD)" \
-+		-I"$(METAMOD)/sourcehook"
++		-I"$(METAMOD)/sourcehook" 
  	CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_BLOODYGOODTIME=4 -DSE_EYE=5 \
  		-DSE_CSS=6 -DSE_ORANGEBOXVALVE=7 -DSE_LEFT4DEAD=8 -DSE_LEFT4DEAD2=9 -DSE_ALIENSWARM=10 \
  		-DSE_PORTAL2=11 -DSE_CSGO=12

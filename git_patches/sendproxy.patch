@@ -1,13 +1,3 @@
-diff --git a/.gitignore b/.gitignore
-index 259148f..7170c9a 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -30,3 +30,5 @@
- *.exe
- *.out
- *.app
-+
-+build/
 diff --git a/addons/sourcemod/extensions/sendproxy.ext.2.csgo.dll b/addons/sourcemod/extensions/sendproxy.ext.2.csgo.dll
 deleted file mode 100644
 index 7b98a3cea8cc1ccb6707ff53b02fe8149f81a4b0..0000000000000000000000000000000000000000
@@ -6124,7 +6114,7 @@ z!>?qwA7LMI!Aa|2oiTNk`6CP;ObI&pD9iHz*K2?@41fL-5A&D$0&W0s(~f71`Xes>
 kJ%NYio5LUYBOInboj=Bzhq%n&Wq%4;+)QQu2*bbs2i<q6Q~&?~
 
 diff --git a/addons/sourcemod/scripting/include/sendproxy.inc b/addons/sourcemod/scripting/include/sendproxy.inc
-index 862d613..effb74f 100644
+index 862d613..a1892ab 100644
 --- a/addons/sourcemod/scripting/include/sendproxy.inc
 +++ b/addons/sourcemod/scripting/include/sendproxy.inc
 @@ -76,6 +76,9 @@ native bool SendProxy_IsPropChangeArrayHookedGameRules(const char[] cPropName, c
@@ -6137,13 +6127,6 @@ index 862d613..effb74f 100644
  #if !defined REQUIRE_EXTENSIONS
  public __ext_sendproxymanager_SetNTVOptional()
  {
-@@ -124,4 +127,4 @@ public Extension __ext_sendproxymanager =
- #endif
- };
- 
--#endif
-\ No newline at end of file
-+#endif
 diff --git a/extension/AMBuildScript b/extension/AMBuildScript
 index 6e7f5c7..ae40aef 100644
 --- a/extension/AMBuildScript
