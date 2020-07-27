@@ -1,7 +1,16 @@
 diff --git a/AMBuildScript b/AMBuildScript
-index 839b733..4b3ad72 100644
+index 839b733..5f3c18a 100644
 --- a/AMBuildScript
 +++ b/AMBuildScript
+@@ -139,7 +139,7 @@ class SteamWorksConfig(object):
+         '-pipe',
+         '-fno-strict-aliasing',
+         '-Wall',
+-        '-Werror',
++        #'-Werror',
+         '-Wno-unused',
+         '-Wno-switch',
+         '-Wno-format',
 @@ -267,6 +267,9 @@ class SteamWorksConfig(object):
        os.path.join(self.sm_root, 'public'),
        os.path.join(self.sm_root, 'public', 'extensions'),
