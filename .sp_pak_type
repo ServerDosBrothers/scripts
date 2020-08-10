@@ -1,17 +1,23 @@
 {
 	"morecolors": {
-		"url": "https://www.doctormckay.com/download/scripting/include/morecolors.inc"
+		"url": "https://www.doctormckay.com/download/scripting/include/morecolors.inc",
+		"path_map": {
+			"addons/sourcemod/scripting/include": ".",
+			"copy": {
+				"morecolors.inc": "addons/sourcemod/scripting/include"
+			}
+		}
 	},
 	"Multi-Colors": {
 		"url": "https://github.com/Bara/Multi-Colors.git",
-		"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include",
-		"addons/sourcemod/scripting": "addons/sourcemod/scripting",
 		"sp_pak_info": {
 			"ignore_plugins": [
 				"multicolors_example.sp"
 			]
 		},
 		"path_map": {
+			"addons/sourcemod/scripting/include": "addons/sourcemod/scripting/include",
+			"addons/sourcemod/scripting": "addons/sourcemod/scripting",
 			"copy": {
 				"addons": "addons"
 			}
@@ -108,6 +114,21 @@
 		"url": "https://github.com/dordnung/System2.git",
 		"path_map": {
 			"addons/sourcemod": "sourcemod"
+		}
+	},
+	"SM-TFEconData": {
+		"url": "https://github.com/nosoop/SM-TFEconData.git",
+		"sp_pak_info": {
+			"depends": [
+				"stocksoup"
+			]
+		},
+		"path_map": {
+			"addons/sourcemod/scripting/include": "scripting/include",
+			"addons/sourcemod/scripting": "scripting",
+			"copy": {
+				"gamedata": "addons/sourcemod/gamedata"
+			}
 		}
 	}
 }

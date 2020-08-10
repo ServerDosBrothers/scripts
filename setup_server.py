@@ -241,6 +241,8 @@ def handle_plugins(plugins, tmp_dir):
 	extra_args = ""
 	if args.upd:
 		extra_args += "-u "
+	if args.nc:
+		extra_args += "-nc "
 	exec = "python \"scripts/package.py\" -s \"" + sourcemod_dir + "\" -o \"" + tmp_dir + "\" -p " + plugins_str + " -d " + defines_str + ' ' + extra_args
 	subprocess.run(exec,shell=True,cwd=os.getcwd())
 
@@ -262,6 +264,7 @@ if __name__ == "__main__":
 	parser.add_argument("-i", action="store_true",required=False, dest="ins")
 	parser.add_argument("-c", action="store_true",required=False, dest="cus")
 	parser.add_argument("-u", action="store_true",required=False, dest="upd")
+	parser.add_argument("-nc", action="store_true",required=False, dest="nc")
 	args = parser.parse_args()
 	
 	all_exts = False

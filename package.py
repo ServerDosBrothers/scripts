@@ -242,12 +242,14 @@ def copy_folder(src, dst):
 				base_name = os.path.basename(folder)
 				if base_name == ".git":
 					continue
-				if folder.is_file():
-					continue
 				newdst = os.path.join(dst,base_name)
-				os.makedirs(newdst,exist_ok=True)
-				#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
-				distutils.dir_util.copy_tree(str(folder),newdst)
+				if folder.is_file():
+					os.makedirs(pathlib.Path(newdst).parent,exist_ok=True)
+					shutil.copyfile(folder,newdst)
+				else:
+					os.makedirs(newdst,exist_ok=True)
+					#shutil.copytree(str(folder),newdst,dirs_exist_ok=True)
+					distutils.dir_util.copy_tree(str(folder),newdst)
 		else:
 			base_name = os.path.basename(src)
 			newdst = os.path.join(dst,base_name)
@@ -285,7 +287,8 @@ def handle_depends_include(depends, extra_includes):
 				if "branch" in dep:
 					branch = dep["branch"]
 				if "git" in url:
-					clone.clone(url, dep_path, branch)
+					if not args.nc:
+						clone.clone(url, dep_path, branch)
 					if "path_map" in dep:
 						path_map = dep["path_map"]
 						if "addons/sourcemod/scripting/include" in path_map:
@@ -426,6 +429,7 @@ if __name__ == "__main__":
 	parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
 	parser.add_argument("-o", action="store",default=os.path.join(cwd,"package"),required=False, dest="fldr")
 	parser.add_argument("-u", action="store_true",required=False, dest="upd")
+	parser.add_argument("-nc", action="store_true",required=False, dest="nc")
 	args = parser.parse_args()
 	
 	pak = args.fldr

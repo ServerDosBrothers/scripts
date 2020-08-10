@@ -16,7 +16,9 @@ if __name__ == "__main__":
 				repo_info = json.load(file)
 				if args.cpl in repo_info:
 					repo = repo_info[args.cpl]
-					subprocess.run("python \"" + os.path.join(cwd,"scripts/setup_server.py") + "\" -p " + repo + " -c", shell=True,cwd=os.getcwd())
+					subprocess.run("python \"" + os.path.join(cwd,"scripts/setup_server.py") + "\" -p " + repo + " -c -nc", shell=True,cwd=os.getcwd())
+				else:
+					print(args.cpl + " not found")
 	else:
 		repo_info = {}
 		for folder in cwd.glob("*"):
