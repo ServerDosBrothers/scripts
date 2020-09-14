@@ -1,10 +1,9 @@
-import re, os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_util, requests, copy, clone
+import re, os, sys, argparse, pathlib, json, subprocess, shutil, distutils.dir_util, requests, copy, clone, jsonmerge
 
 cwd = pathlib.Path(os.getcwd())
 
 tmp_dir = os.path.join(cwd,"tmp")
 thirdparty = os.path.join(cwd,"thirdparty")
-sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type")
 
 base_update_url = "https://raw.githubusercontent.com/ServerDosBrothers/package/master"
 post_update_url = "?token="
@@ -430,6 +429,7 @@ if __name__ == "__main__":
 	parser.add_argument("-o", action="store",default=os.path.join(cwd,"package"),required=False, dest="fldr")
 	parser.add_argument("-u", action="store_true",required=False, dest="upd")
 	parser.add_argument("-nc", action="store_true",required=False, dest="nc")
+	parser.add_argument("-l4d2", action="store_true",required=False, dest="L4D2")
 	args = parser.parse_args()
 	
 	pak = args.fldr
@@ -468,6 +468,11 @@ if __name__ == "__main__":
 			if d[:-1] != '=':
 				d += '='
 			defines += d + ' '
+			
+	if args.L4D2:
+		defines += "GAME_L4D2=1 "
+	else:
+		defines += "GAME_TF2=1 "
 	
 	os.makedirs(thirdparty,exist_ok=True)
 	os.makedirs(tmp_dir,exist_ok=True)
@@ -475,9 +480,27 @@ if __name__ == "__main__":
 		shutil.rmtree(pak,ignore_errors=True)
 
 	sp_pak_type = None
+	sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type")
 	if os.path.exists(sp_pak_type_path):
 		with open(sp_pak_type_path,"r") as file:
 			sp_pak_type = json.load(file)
+	
+	if args.L4D2:
+		sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type-l4d2")
+		if os.path.exists(sp_pak_type_path):
+			with open(sp_pak_type_path,"r") as file:
+				if sp_pak_type is None:
+					sp_pak_type = json.load(file)
+				else:
+					sp_pak_type = jsonmerge.merge(sp_pak_type, json.load(file))
+	else:
+		sp_pak_type_path = os.path.join(cwd,"scripts/.sp_pak_type-tf")
+		if os.path.exists(sp_pak_type_path):
+			with open(sp_pak_type_path,"r") as file:
+				if sp_pak_type is None:
+					sp_pak_type = json.load(file)
+				else:
+					sp_pak_type = jsonmerge.merge(sp_pak_type, json.load(file))
 
 	all_plugins = []
 

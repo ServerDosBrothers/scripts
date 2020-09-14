@@ -5,6 +5,7 @@ cwd = pathlib.Path(os.getcwd())
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-c", action="store", required=False, dest="cpl")
+	parser.add_argument("-l4d2", action="store_true",required=False, dest="L4D2")
 	args = parser.parse_args()
 	
 	vscode_dir = os.path.join(cwd,"vscode")
@@ -16,7 +17,10 @@ if __name__ == "__main__":
 				repo_info = json.load(file)
 				if args.cpl in repo_info:
 					repo = repo_info[args.cpl]
-					subprocess.run("python \"" + os.path.join(cwd,"scripts/setup_server.py") + "\" -p " + repo + " -c -nc", shell=True,cwd=os.getcwd())
+					cmd = "python \"" + os.path.join(cwd,"scripts/setup_server.py") + "\" -p " + repo + " -c -nc "
+					if args.L4D2:
+						cmd += "-l4d2"
+					subprocess.run(cmd, shell=True,cwd=os.getcwd())
 				else:
 					print(args.cpl + " not found")
 	else:
@@ -50,12 +54,16 @@ if __name__ == "__main__":
 			json_data["folders"] = [
 				{"path": "files"},
 			]
-			json_data["settings"] = {
-				"sourcepawnLanguageServer.sourcemod_home": os.path.join(cwd,"server/serverfiles/tf/addons/sourcemod/scripting/include"),
-			}
+			json_data["settings"] = {}
+			if args.L4D2:
+				inc_dir = os.path.join(cwd,"server/serverfiles-l4d2/left4dead2/addons/sourcemod/scripting/include")
+			else:
+				inc_dir = os.path.join(cwd,"server/serverfiles-tf/tf/addons/sourcemod/scripting/include")
+			json_data["settings"]["sourcepawnLanguageServer.sourcemod_home"] = inc_dir
 			json_data = json.dumps(json_data)
 			file.write(json_data)
 			
+		os.makedirs(os.path.join(vscode_dir,"files/.vscode"),exist_ok=True)
 		with open(os.path.join(vscode_dir,"files/.vscode/tasks.json"), "w") as file:
 			json_data = {}
 			json_data["version"] = "2.0.0"
@@ -63,7 +71,6 @@ if __name__ == "__main__":
 				{
 					"label": "setup_server",
 					"type": "shell",
-					"command": "python \"" + os.path.join(cwd,"scripts/vs_code.py") + "\" -c \"${file}\"",
 					"options": {
 						"cwd": str(cwd),
 					},
@@ -73,5 +80,9 @@ if __name__ == "__main__":
 					}
 				}
 			]
+			extra_args = ""
+			if args.L4D2:
+				extra_args = "-l4d2"
+			json_data["tasks"][0]["command"] = "python \"" + os.path.join(cwd,"scripts/vs_code.py") + "\" -c \"${file}\" " + extra_args
 			json_data = json.dumps(json_data)
 			file.write(json_data)

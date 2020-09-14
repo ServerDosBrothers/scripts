@@ -1,0 +1,13 @@
+diff --git a/public/tier1/utlmemory.h b/public/tier1/utlmemory.h
+index 5b0c8ffb..ffad7efe 100644
+--- a/public/tier1/utlmemory.h
++++ b/public/tier1/utlmemory.h
+@@ -18,6 +18,8 @@
+ #include <string.h>
+ #include "tier0/platform.h"
+ 
++#include "mathlib/mathlib.h"
++
+ #include "tier0/memalloc.h"
+ #include "tier0/memdbgon.h"
+ 

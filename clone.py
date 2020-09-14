@@ -2,7 +2,7 @@ import os, sys, argparse, requests, json, pathlib, subprocess, package
 
 cwd = pathlib.Path(os.getcwd())
 
-def clone(url, path, branch="master"):
+def clone(url, path, branch="master",recursive=True):
 	old_cwd = os.getcwd()
 	os.makedirs(path,exist_ok=True)
 	os.chdir(path)
@@ -12,7 +12,10 @@ def clone(url, path, branch="master"):
 		subprocess.run("git clean --force -d",shell=True,cwd=os.getcwd())
 		subprocess.run("git pull --rebase",shell=True,cwd=os.getcwd())
 	else:
-		clone_cmd = "git clone --recursive \""+url+"\" \"" + path + "\" --branch=\"" + branch +"\""
+		clone_cmd = "git clone "
+		if recursive:
+			clone_cmd += "--recursive "
+		clone_cmd += "\""+url+"\" \"" + path + "\" --branch=\"" + branch +"\""
 		subprocess.run(clone_cmd,shell=True,cwd=os.getcwd())
 	patch_path = os.path.join(cwd,"scripts/git_patches",os.path.basename(path)+".patch")
 	if os.path.exists(patch_path):

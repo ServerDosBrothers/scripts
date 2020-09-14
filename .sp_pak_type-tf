@@ -1,0 +1,23 @@
+{
+	"TF2Items": {
+		"url": "https://github.com/asherkin/TF2Items.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "pawn"
+		}
+	},
+	"SM-TFEconData": {
+		"url": "https://github.com/nosoop/SM-TFEconData.git",
+		"sp_pak_info": {
+			"depends": [
+				"stocksoup"
+			]
+		},
+		"path_map": {
+			"addons/sourcemod/scripting/include": "scripting/include",
+			"addons/sourcemod/scripting": "scripting",
+			"copy": {
+				"gamedata": "addons/sourcemod/gamedata"
+			}
+		}
+	}
+}

@@ -68,12 +68,6 @@
 			"addons/sourcemod/scripting/include": ".."
 		}
 	},
-	"TF2Items": {
-		"url": "https://github.com/asherkin/TF2Items.git",
-		"path_map": {
-			"addons/sourcemod/scripting/include": "pawn"
-		}
-	},
 	"DHooks2": {
 		"url": "https://github.com/peace-maker/DHooks2.git",
 		"branch": "dynhooks",
@@ -114,21 +108,6 @@
 		"url": "https://github.com/dordnung/System2.git",
 		"path_map": {
 			"addons/sourcemod": "sourcemod"
-		}
-	},
-	"SM-TFEconData": {
-		"url": "https://github.com/nosoop/SM-TFEconData.git",
-		"sp_pak_info": {
-			"depends": [
-				"stocksoup"
-			]
-		},
-		"path_map": {
-			"addons/sourcemod/scripting/include": "scripting/include",
-			"addons/sourcemod/scripting": "scripting",
-			"copy": {
-				"gamedata": "addons/sourcemod/gamedata"
-			}
 		}
 	}
 }
