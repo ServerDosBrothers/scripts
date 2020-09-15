@@ -83,8 +83,8 @@ def handle_ext(ext):
 		repo = ("https://github.com/dordnung/System2.git",)
 	elif ext == "l4dtoolz":
 		repo = ("https://github.com/ivailosp/l4dtoolz.git",)
-	elif ext == "left4downtown-redux":
-		repo = ("https://github.com/JeremyDF93/left4downtown-redux.git",)
+	elif ext == "Left4Downtown2":
+		repo = ("https://github.com/Attano/Left4Downtown2.git",)
 	
 	if repo is None:
 		return
@@ -111,6 +111,8 @@ def handle_ext(ext):
 		hl2sdk_dir = os.path.join(sources,"hl2sdk-tf2")
 		
 	sourcemod_bin_dir = os.path.join(game,"addons/sourcemod")
+
+	os.environ["SRCDS_BASE"] = str(pathlib.Path(game).parent)
 
 	os.environ["SOURCEMOD14"] = sourcemod_src_dir
 	os.environ["SOURCEMOD16"] = sourcemod_src_dir
@@ -240,11 +242,12 @@ def handle_ext(ext):
 		subprocess.run("make -j4",shell=True,cwd=os.getcwd())
 		package.copy_folder(os.path.join(l4dz_src_dir,"Release.left4dead2/l4dtoolz_mm_i486.so"),os.path.join(game,"addons"))
 		package.copy_folder(os.path.join(l4dz_src_dir,"l4dtoolz.vdf"),os.path.join(game,"addons/metamod"))
-	elif ext == "left4downtown-redux":
-		l4dr_src_dir = os.path.join(sources,"left4downtown-redux")
+	elif ext == "Left4Downtown2":
+		os.environ["USE_PLAYERSLOTS"] = "false"
+		l4dr_src_dir = os.path.join(sources,"Left4Downtown2")
 		os.chdir(l4dr_src_dir)
-		build_ambuild2(base_args_ext + "--sm-bin-path=\"" + sourcemod_bin_dir + "\"")
-		package.copy_folder(os.path.join(l4dr_src_dir,"build/package"),game)
+		subprocess.run("make -j4",shell=True,cwd=os.getcwd())
+		package.copy_folder(os.path.join(l4dr_src_dir,"Release/left4downtown.ext.2.l4d2.so"),os.path.join(game,"addons/sourcemod/extensions"))
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
@@ -275,7 +278,7 @@ def handle_exts(exts):
 		if args.L4D2:
 			exts += [
 				"l4dtoolz",
-				"left4downtown-redux",
+				"Left4Downtown2",
 			]
 		else:
 			exts += [
