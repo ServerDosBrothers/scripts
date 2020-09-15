@@ -1,0 +1,17 @@
+{
+	"Left4Downtown2": {
+		"url": "https://github.com/Attano/Left4Downtown2.git",
+		"sp_pak_info": {
+			"ignore_plugins": [
+				"l4do_test.sp"
+			]
+		},
+		"path_map": {
+			"addons/sourcemod/scripting/include": "scripting/include",
+			"addons/sourcemod/scripting": "scripting",
+			"copy": {
+				"gamedata": "addons/sourcemod/gamedata"
+			}
+		}
+	}
+}

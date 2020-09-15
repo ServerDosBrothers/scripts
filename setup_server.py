@@ -248,6 +248,8 @@ def handle_ext(ext):
 		os.chdir(l4dr_src_dir)
 		subprocess.run("make -j4",shell=True,cwd=os.getcwd())
 		package.copy_folder(os.path.join(l4dr_src_dir,"Release/left4downtown.ext.2.l4d2.so"),os.path.join(game,"addons/sourcemod/extensions"))
+		package.copy_folder(os.path.join(l4dr_src_dir,"scripting"),os.path.join(game,"addons/sourcemod/scripting"))
+		package.copy_folder(os.path.join(l4dr_src_dir,"gamedata"),os.path.join(game,"addons/sourcemod/gamedata"))
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
