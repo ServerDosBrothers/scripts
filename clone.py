@@ -2,21 +2,27 @@ import os, sys, argparse, requests, json, pathlib, subprocess, package
 
 cwd = pathlib.Path(os.getcwd())
 
-def clone(url, path, branch="master",recursive=True):
+def clone(url, path, branch="master",recursive=True,sha=None):
 	old_cwd = os.getcwd()
 	os.makedirs(path,exist_ok=True)
 	os.chdir(path)
 	if os.path.exists(os.path.join(path,".git")):
 		subprocess.run("git fetch",shell=True,cwd=os.getcwd())
-		subprocess.run("git reset --hard",shell=True,cwd=os.getcwd())
+		reset = "git reset --hard "
+		if sha is not None:
+			reset += sha
 		subprocess.run("git clean --force -d",shell=True,cwd=os.getcwd())
 		subprocess.run("git pull --rebase",shell=True,cwd=os.getcwd())
+		subprocess.run(reset,shell=True,cwd=os.getcwd())
 	else:
 		clone_cmd = "git clone "
 		if recursive:
 			clone_cmd += "--recursive "
 		clone_cmd += "\""+url+"\" \"" + path + "\" --branch=\"" + branch +"\""
 		subprocess.run(clone_cmd,shell=True,cwd=os.getcwd())
+		if sha is not None:
+			os.chdir(path)
+			subprocess.run("git reset --hard " + sha,shell=True,cwd=os.getcwd())
 	patch_path = os.path.join(cwd,"scripts/git_patches",os.path.basename(path)+".patch")
 	if os.path.exists(patch_path):
 		subprocess.run("git apply --reject --whitespace=fix \"" + patch_path + "\"",shell=True,cwd=os.getcwd())

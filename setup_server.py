@@ -81,6 +81,10 @@ def handle_ext(ext):
 		repo = ("https://github.com/ServerDosBrothers/SVB-Vtflib.git",)
 	elif ext == "System2":
 		repo = ("https://github.com/dordnung/System2.git",)
+	elif ext == "l4dtoolz":
+		repo = ("https://github.com/ivailosp/l4dtoolz.git",)
+	elif ext == "left4downtown-redux":
+		repo = ("https://github.com/JeremyDF93/left4downtown-redux.git",)
 	
 	if repo is None:
 		return
@@ -92,13 +96,13 @@ def handle_ext(ext):
 	if ext == "sourcemod":
 		sourcepawn_src_dir = os.path.join(sourcemod_src_dir,"sourcepawn")
 		#shutil.rmtree(sourcepawn_src_dir,ignore_errors=True)
-		clone.clone("https://github.com/alliedmodders/sourcepawn.git",sourcepawn_src_dir,"master",False)
+		clone.clone("https://github.com/alliedmodders/sourcepawn.git",sourcepawn_src_dir,recursive=False,sha="3ec6182c993a7717d81cbc6ab5dfec553de7387f")
 		amtl_src_dir = os.path.join(sourcepawn_src_dir,"third_party/amtl")
 		#shutil.rmtree(amtl_src_dir,ignore_errors=True)
-		clone.clone("https://github.com/alliedmodders/amtl.git",amtl_src_dir,"master",False)
+		clone.clone("https://github.com/alliedmodders/amtl.git",amtl_src_dir,recursive=False)
 		amtl_src_dir = os.path.join(sourcemod_src_dir,"public/amtl")
 		#shutil.rmtree(amtl_src_dir,ignore_errors=True)
-		clone.clone("https://github.com/alliedmodders/amtl.git",amtl_src_dir,"master",False)
+		clone.clone("https://github.com/alliedmodders/amtl.git",amtl_src_dir,recursive=False)
 	
 	mmsource_src_dir = os.path.join(sources,"metamod-source")
 	if args.L4D2:
@@ -106,11 +110,15 @@ def handle_ext(ext):
 	else:
 		hl2sdk_dir = os.path.join(sources,"hl2sdk-tf2")
 		
+	sourcemod_bin_dir = os.path.join(game,"addons/sourcemod")
+
 	os.environ["SOURCEMOD14"] = sourcemod_src_dir
 	os.environ["SOURCEMOD16"] = sourcemod_src_dir
 	os.environ["SOURCEMOD"] = sourcemod_src_dir
 	os.environ["SMCENTRAL"] = sourcemod_src_dir
 	os.environ["SMSDK"] = sourcemod_src_dir
+	
+	os.environ["SOURCEMOD_BINS"] = sourcemod_bin_dir
 	
 	os.environ["MMSOURCE19"] = mmsource_src_dir
 	os.environ["MMSOURCE18"] = mmsource_src_dir
@@ -225,7 +233,18 @@ def handle_ext(ext):
 		build_ambuild2(base_args_ext)
 		package.copy_folder(os.path.join(vtflib_src_dir,"build/package"),game)
 	elif ext == "System2":
-		pass
+		print("eu esqueci pq desisti de faze o system2 compila tem q baixa manual")
+	elif ext == "l4dtoolz":
+		l4dz_src_dir = os.path.join(sources,"l4dtoolz")
+		os.chdir(l4dz_src_dir)
+		subprocess.run("make -j4",shell=True,cwd=os.getcwd())
+		package.copy_folder(os.path.join(l4dz_src_dir,"Release.left4dead2/l4dtoolz_mm_i486.so"),os.path.join(game,"addons"))
+		package.copy_folder(os.path.join(l4dz_src_dir,"l4dtoolz.vdf"),os.path.join(game,"addons/metamod"))
+	elif ext == "left4downtown-redux":
+		l4dr_src_dir = os.path.join(sources,"left4downtown-redux")
+		os.chdir(l4dr_src_dir)
+		build_ambuild2(base_args_ext + "--sm-bin-path=\"" + sourcemod_bin_dir + "\"")
+		package.copy_folder(os.path.join(l4dr_src_dir,"build/package"),game)
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
@@ -253,8 +272,13 @@ def handle_exts(exts):
 			"SVB-Vtflib",
 			"System2",
 		]
-		if not args.L4D2:
-			exsts += [
+		if args.L4D2:
+			exts += [
+				"l4dtoolz",
+				"left4downtown-redux",
+			]
+		else:
+			exts += [
 				"TF2Items",
 			]
 	
