@@ -290,12 +290,17 @@ def handle_exts(exts):
 	for ext in exts:
 		handle_ext(ext)
 
-def handle_plugins(plugins, tmp_dir):
+def handle_plugins(plugins, tmp_dir, files):
 	sourcemod_dir = os.path.join(game,"addons/sourcemod")
 	
 	plugins_str=""
 	for plugin in plugins:
 		plugins_str+= plugin + ' '
+		
+	files_str=""
+	if files:
+		for file in files:
+			files_str+= file + ' '
 	
 	defines = []
 	if debug:
@@ -315,7 +320,10 @@ def handle_plugins(plugins, tmp_dir):
 		extra_args += "-nc "
 	if args.L4D2:
 		extra_args += "-l4d2 "
-	exec = "python \"scripts/package.py\" -s \"" + sourcemod_dir + "\" -o \"" + tmp_dir + "\" -p " + plugins_str + " -d " + defines_str + ' ' + extra_args
+	exec = "python \"scripts/package.py\" -s \"" + sourcemod_dir + "\" -o \"" + tmp_dir + "\" -p " + plugins_str + " "
+	if files_str:
+		exec += "-pf " + files_str + " "
+	exec += "-d " + defines_str + ' ' + extra_args
 	subprocess.run(exec,shell=True,cwd=os.getcwd())
 
 def remove_if_empty(folder, later):
@@ -331,6 +339,7 @@ if __name__ == "__main__":
 	parser.add_argument("-o", action="store",default=os.path.join(cwd,"server"),required=False, dest="fldr")
 	parser.add_argument("-e", action="store",nargs="*",required=False, dest="ext")
 	parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
+	parser.add_argument("-pf", action="store",nargs="*",required=False, dest="plf")
 	parser.add_argument("-d", action="store_true",required=False, dest="deb")
 	parser.add_argument("-f", action="store_true",required=False, dest="fst")
 	parser.add_argument("-i", action="store_true",required=False, dest="ins")
@@ -387,7 +396,7 @@ if __name__ == "__main__":
 	if args.ext is not None:
 		handle_exts(args.ext)
 	if args.plu is not None:
-		handle_plugins(args.plu, tmp_dir)
+		handle_plugins(args.plu, tmp_dir, args.plf)
 
 	remove_later = []
 

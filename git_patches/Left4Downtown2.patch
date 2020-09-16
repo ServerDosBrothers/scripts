@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 5d7fe79..241bced 100644
+index 5d7fe79..0e05910 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,10 +1,7 @@
@@ -48,7 +48,7 @@ index 5d7fe79..241bced 100644
  
  ################################################
  ### DO NOT EDIT BELOW HERE FOR MOST PROJECTS ###
-@@ -108,27 +105,27 @@ $(BIN_DIR)/%.o: %.cpp
+@@ -108,27 +105,35 @@ $(BIN_DIR)/%.o: %.cpp
  	$(CPP) $(INCLUDE) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
  
  all:
@@ -87,7 +87,15 @@ index 5d7fe79..241bced 100644
  
  extension: $(OBJ_LINUX)
 -	$(CPP) $(INCLUDE) $(OBJ_LINUX) $(SMSDK)/public/asm/asm.c $(LINK) -o $(BIN_DIR)/$(BINARY)
-+	$(CPP) $(INCLUDE) $(OBJ_LINUX) "$(SMSDK)/public/asm/asm.c" $(LINK) -o "$(BIN_DIR)/$(BINARY)"
++	$(CPP) $(INCLUDE) $(OBJ_LINUX) \
++	"$(SMSDK)/public/asm/asm.c" \
++	"$(SMSDK)/public/libudis86/decode.c" \
++	"$(SMSDK)/public/libudis86/itab.c" \
++	"$(SMSDK)/public/libudis86/syn-att.c" \
++	"$(SMSDK)/public/libudis86/syn-intel.c" \
++	"$(SMSDK)/public/libudis86/syn.c" \
++	"$(SMSDK)/public/libudis86/udis86.c" \
++	$(LINK) -o "$(BIN_DIR)/$(BINARY)"
  
  debug:
  	$(MAKE) -f Makefile all DEBUG=true

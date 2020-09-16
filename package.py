@@ -137,100 +137,107 @@ def replace_version(code, gitfolder, commit, plugin):
 			plugin["version"] = tpstr
 	return code
 
+def handle_sp_file(file, folder, extra_includes, gitfolder, gitname, sp_pak_info):
+	file_basename = os.path.basename(file)
+	if sp_pak_info:
+		if "ignore_plugins" in sp_pak_info:
+			if file_basename in sp_pak_info["ignore_plugins"]:
+				return None
+	if args.plf:
+		if file_basename not in args.plf:
+			return None
+	plugin = {}
+	print("Compiling " + file_basename + " from " + gitname)
+	code = ""
+	newfile_path = os.path.join(tmp_dir,file_basename)
+	file_basename = os.path.splitext(file_basename)[0]
+	if sp_pak_info:
+		if "name_append" in sp_pak_info:
+			file_basename = sp_pak_info["name_append"] + file_basename
+	with open(file,"r") as newfile:
+		code = newfile.read()
+	commit = ""
+	if os.path.exists(os.path.join(gitfolder,".git")):
+		old_cwd = os.getcwd()
+		os.chdir(gitfolder)
+		commit = subprocess.check_output("git rev-parse HEAD", shell=True,cwd=os.getcwd())
+		commit = commit[:-1]
+		commit = commit.decode("utf-8")
+		note = subprocess.check_output("git log -1 --pretty=format:%B", shell=True,cwd=os.getcwd())
+		note = note[:-1]
+		note = note.decode("utf-8")
+		plugin["note"] = note
+		os.chdir(old_cwd)
+	else:
+		commit = "Unknown"
+	code = replace_version(code, gitname, commit, plugin)
+	update_url = os.path.join(base_update_url, file_basename + ".txt") + post_update_url
+	code = replace_updateurl(code, gitname, plugin, update_url)
+	with open(newfile_path,"w") as newfile:
+		newfile.write(code)
+	file_folder = file.parent
+	includes = [file_folder]
+	for extra in folder.glob("*"):
+		if extra.is_file():
+			continue
+		includes.append(extra)
+	includes += extra_includes + base_sp_includes
+	includes_str = ""
+	for inc in includes:
+		includes_str += "-i \"" + str(inc) + "\" "
+	extra_path = ""
+	if "SVB-" in gitname:
+		extra_path = os.path.join(extra_path,"svb")
+	else:
+		extra_path = os.path.join(extra_path,"thirdparty")
+	extra_flags = ""
+	if sp_pak_info:
+		if "path_append" in sp_pak_info:
+			extra_path = os.path.join(extra_path,sp_pak_info["path_append"])
+		if "disable_warnings" in sp_pak_info:
+			for warn in sp_pak_info["disable_warnings"]:
+				extra_flags += "-w" + str(warn) + ' '
+		if "warning_errors" in sp_pak_info:
+			if sp_pak_info["warning_errors"] == True:
+				extra_flags += "-E "
+		if "defines" in sp_pak_info:
+			for define, value in sp_pak_info["defines"].items():
+				extra_flags += define + '=' + value + ' '
+	plugin["name"] = file_basename
+	output_path = os.path.join(pak_plugins,extra_path,file_basename+".smx")
+	plugin["path"] = output_path
+	os.makedirs(pathlib.Path(output_path).parent, exist_ok=True)
+	exec = base_sp_exec + "\"" + str(newfile_path) + "\" -o \"" + output_path + "\" " + includes_str + extra_flags
+	exec += defines
+	stdout = subprocess.run(exec, shell=True,cwd=os.getcwd(), stdout=subprocess.PIPE).stdout
+	if stdout:
+		stdout = stdout[:-1]
+		stdout = stdout.decode("utf-8")
+		idx = stdout.find("Code size:")
+		if idx != -1:
+			if idx:
+				stdout = stdout[:idx-1]
+			else:
+				stdout = ""
+		idx = stdout.find("Compilation aborted.")
+		if idx != -1:
+			if idx:
+				stdout = stdout[:idx-2]
+			else:
+				stdout = ""
+		if stdout:
+			print(stdout)
+	if remove_tmp:
+		os.remove(newfile_path)
+
 def handle_sp_folder(folder, extra_includes, gitfolder, sp_pak_info):
 	folder = pathlib.Path(folder)
 	gitname = os.path.basename(gitfolder)
 	plugins = []
 	for file in folder.glob("*.sp"):
-		file_basename = os.path.basename(file)
-		if sp_pak_info:
-			if "ignore_plugins" in sp_pak_info:
-				if file_basename in sp_pak_info["ignore_plugins"]:
-					continue
-		plugin = {}
-		print("Compiling " + file_basename + " from " + gitname)
-		code = ""
-		newfile_path = os.path.join(tmp_dir,file_basename)
-		file_basename = os.path.splitext(file_basename)[0]
-		if sp_pak_info:
-			if "name_append" in sp_pak_info:
-				file_basename = sp_pak_info["name_append"] + file_basename
-		with open(file,"r") as newfile:
-			code = newfile.read()
-		commit = ""
-		if os.path.exists(os.path.join(gitfolder,".git")):
-			old_cwd = os.getcwd()
-			os.chdir(gitfolder)
-			commit = subprocess.check_output("git rev-parse HEAD", shell=True,cwd=os.getcwd())
-			commit = commit[:-1]
-			commit = commit.decode("utf-8")
-			note = subprocess.check_output("git log -1 --pretty=format:%B", shell=True,cwd=os.getcwd())
-			note = note[:-1]
-			note = note.decode("utf-8")
-			plugin["note"] = note
-			os.chdir(old_cwd)
-		else:
-			commit = "Unknown"
-		code = replace_version(code, gitname, commit, plugin)
-		update_url = os.path.join(base_update_url, file_basename + ".txt") + post_update_url
-		code = replace_updateurl(code, gitname, plugin, update_url)
-		with open(newfile_path,"w") as newfile:
-			newfile.write(code)
-		file_folder = file.parent
-		includes = [file_folder]
-		for extra in folder.glob("*"):
-			if extra.is_file():
-				continue
-			includes.append(extra)
-		includes += extra_includes + base_sp_includes
-		includes_str = ""
-		for inc in includes:
-			includes_str += "-i \"" + str(inc) + "\" "
-		extra_path = ""
-		if "SVB-" in gitname:
-			extra_path = os.path.join(extra_path,"svb")
-		else:
-			extra_path = os.path.join(extra_path,"thirdparty")
-		extra_flags = ""
-		if sp_pak_info:
-			if "path_append" in sp_pak_info:
-				extra_path = os.path.join(extra_path,sp_pak_info["path_append"])
-			if "disable_warnings" in sp_pak_info:
-				for warn in sp_pak_info["disable_warnings"]:
-					extra_flags += "-w" + str(warn) + ' '
-			if "warning_errors" in sp_pak_info:
-				if sp_pak_info["warning_errors"] == True:
-					extra_flags += "-E "
-			if "defines" in sp_pak_info:
-				for define, value in sp_pak_info["defines"].items():
-					extra_flags += define + '=' + value + ' '
-		plugin["name"] = file_basename
-		output_path = os.path.join(pak_plugins,extra_path,file_basename+".smx")
-		plugin["path"] = output_path
-		os.makedirs(pathlib.Path(output_path).parent, exist_ok=True)
-		exec = base_sp_exec + "\"" + str(newfile_path) + "\" -o \"" + output_path + "\" " + includes_str + extra_flags
-		exec += defines
-		stdout = subprocess.run(exec, shell=True,cwd=os.getcwd(), stdout=subprocess.PIPE).stdout
-		if stdout:
-			stdout = stdout[:-1]
-			stdout = stdout.decode("utf-8")
-			idx = stdout.find("Code size:")
-			if idx != -1:
-				if idx:
-					stdout = stdout[:idx-1]
-				else:
-					stdout = ""
-			idx = stdout.find("Compilation aborted.")
-			if idx != -1:
-				if idx:
-					stdout = stdout[:idx-2]
-				else:
-					stdout = ""
-			if stdout:
-				print(stdout)
-		if remove_tmp:
-			os.remove(newfile_path)
-		plugins.append(plugin)
+		plugin = handle_sp_file(file, folder, extra_includes, gitfolder, gitname, sp_pak_info)
+		if plugin is not None:
+			plugins.append(plugin)
 	return plugins
 
 def copy_folder(src, dst):
@@ -426,6 +433,7 @@ if __name__ == "__main__":
 	parser.add_argument("-s", action="store", required=True, dest="sm")
 	parser.add_argument("-d", action="store",nargs="*",required=False, dest="defi")
 	parser.add_argument("-p", action="store",nargs="*",required=False, dest="plu")
+	parser.add_argument("-pf", action="store",nargs="*",required=False, dest="plf")
 	parser.add_argument("-o", action="store",default=os.path.join(cwd,"package"),required=False, dest="fldr")
 	parser.add_argument("-u", action="store_true",required=False, dest="upd")
 	parser.add_argument("-nc", action="store_true",required=False, dest="nc")

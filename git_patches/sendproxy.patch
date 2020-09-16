@@ -6113,6 +6113,40 @@ zcnC+iJ^(m_13~i5-|cvqFX09OHy8kiDC@^~*k^>Jd>sN@E)tRs_(xo9>ud2Ce8Z4(
 z!>?qwA7LMI!Aa|2oiTNk`6CP;ObI&pD9iHz*K2?@41fL-5A&D$0&W0s(~f71`Xes>
 kJ%NYio5LUYBOInboj=Bzhq%n&Wq%4;+)QQu2*bbs2i<q6Q~&?~
 
+diff --git a/addons/sourcemod/gamedata/sendproxy.txt b/addons/sourcemod/gamedata/sendproxy.txt
+index 337e36e..071f0f0 100644
+--- a/addons/sourcemod/gamedata/sendproxy.txt
++++ b/addons/sourcemod/gamedata/sendproxy.txt
+@@ -1,5 +1,29 @@
+ "Games"
+ {
++	"left4dead2"
++	{
++		"Signatures"
++		{
++			"CGameClient::ShouldSendMessages"
++			{
++				"library"			"engine"
++				"windows"			""
++				"linux"				"@_ZN11CGameClient18ShouldSendMessagesEv"
++			}
++			"CGameServer::SendClientMessages"
++			{
++				"library"			"engine"
++				"windows"			""
++				"linux"				"@_ZN11CGameServer18SendClientMessagesEb"
++			}
++			"SV_ComputeClientPacks"
++			{
++				"library"			"engine"
++				"windows"			""
++				"linux"				"@_Z21SV_ComputeClientPacksiPP11CGameClientP14CFrameSnapshot"
++			}
++		}
++	}
+ 	"tf"
+ 	{
+ 		"Signatures"
 diff --git a/addons/sourcemod/scripting/include/sendproxy.inc b/addons/sourcemod/scripting/include/sendproxy.inc
 index 862d613..a1892ab 100644
 --- a/addons/sourcemod/scripting/include/sendproxy.inc

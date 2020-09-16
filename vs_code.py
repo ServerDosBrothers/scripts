@@ -5,6 +5,7 @@ cwd = pathlib.Path(os.getcwd())
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-c", action="store", required=False, dest="cpl")
+	parser.add_argument("-uf", action="store_true", required=False, dest="cuf")
 	parser.add_argument("-l4d2", action="store_true",required=False, dest="L4D2")
 	args = parser.parse_args()
 	
@@ -15,14 +16,17 @@ if __name__ == "__main__":
 		if os.path.exists(repo_info_path):
 			with open(repo_info_path,"r") as file:
 				repo_info = json.load(file)
-				if args.cpl in repo_info:
-					repo = repo_info[args.cpl]
+				file_basename = os.path.basename(args.cpl)
+				if file_basename in repo_info:
+					repo = repo_info[file_basename]
 					cmd = "python \"" + os.path.join(cwd,"scripts/setup_server.py") + "\" -p " + repo + " -c -nc "
 					if args.L4D2:
-						cmd += "-l4d2"
+						cmd += "-l4d2 "
+					if args.cuf:
+						cmd += "-pf " + file_basename
 					subprocess.run(cmd, shell=True,cwd=os.getcwd())
 				else:
-					print(args.cpl + " not found")
+					print(file_basename + " not found")
 	else:
 		repo_info = {}
 		for folder in cwd.glob("*"):
@@ -40,7 +44,8 @@ if __name__ == "__main__":
 					newpath = str(file).replace(folder_str,"")
 					newpath = newpath[1:]
 					newpath = os.path.join(vscode_dir,"files",newpath)
-					repo_info[newpath] = os.path.basename(folder)
+					file_basename = os.path.basename(file)
+					repo_info[file_basename] = os.path.basename(folder)
 					os.makedirs(pathlib.Path(newpath).parent,exist_ok=True)
 					if not os.path.exists(newpath):
 						os.symlink(file,newpath)
@@ -82,7 +87,9 @@ if __name__ == "__main__":
 			]
 			extra_args = ""
 			if args.L4D2:
-				extra_args = "-l4d2"
+				extra_args += "-l4d2 "
+			if args.cuf:
+				extra_args += "-uf "
 			json_data["tasks"][0]["command"] = "python \"" + os.path.join(cwd,"scripts/vs_code.py") + "\" -c \"${file}\" " + extra_args
 			json_data = json.dumps(json_data)
 			file.write(json_data)
