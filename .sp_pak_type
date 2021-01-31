@@ -109,5 +109,12 @@
 		"path_map": {
 			"addons/sourcemod": "sourcemod"
 		}
+	},
+	"SMJansson": {
+		"url": "https://github.com/thraaawn/SMJansson.git",
+		"path_map": {
+			"addons/sourcemod/scripting/include": "pawn/scripting/include",
+			"addons/sourcemod/scripting": "pawn/scripting"
+		}
 	}
 }

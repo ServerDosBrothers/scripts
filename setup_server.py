@@ -85,6 +85,8 @@ def handle_ext(ext):
 		repo = ("https://github.com/ivailosp/l4dtoolz.git",)
 	elif ext == "Left4Downtown2":
 		repo = ("https://github.com/Attano/Left4Downtown2.git",)
+	elif ext == "SMJansson":
+		repo = ("https://github.com/thraaawn/SMJansson.git",)
 	
 	if repo is None:
 		return
@@ -96,7 +98,7 @@ def handle_ext(ext):
 	if ext == "sourcemod":
 		sourcepawn_src_dir = os.path.join(sourcemod_src_dir,"sourcepawn")
 		#shutil.rmtree(sourcepawn_src_dir,ignore_errors=True)
-		clone.clone("https://github.com/alliedmodders/sourcepawn.git",sourcepawn_src_dir,recursive=False,sha="3ec6182c993a7717d81cbc6ab5dfec553de7387f")
+		clone.clone("https://github.com/alliedmodders/sourcepawn.git",sourcepawn_src_dir,recursive=False)
 		amtl_src_dir = os.path.join(sourcepawn_src_dir,"third_party/amtl")
 		#shutil.rmtree(amtl_src_dir,ignore_errors=True)
 		clone.clone("https://github.com/alliedmodders/amtl.git",amtl_src_dir,recursive=False)
@@ -250,6 +252,8 @@ def handle_ext(ext):
 		package.copy_folder(os.path.join(l4dr_src_dir,"Release/left4downtown.ext.2.l4d2.so"),os.path.join(game,"addons/sourcemod/extensions"))
 		package.copy_folder(os.path.join(l4dr_src_dir,"scripting"),os.path.join(game,"addons/sourcemod/scripting"))
 		package.copy_folder(os.path.join(l4dr_src_dir,"gamedata"),os.path.join(game,"addons/sourcemod/gamedata"))
+	elif ext == "SMJansson":
+		pass
 
 def handle_exts(exts):
 	clone_repo(("https://github.com/alliedmodders/ambuild.git",))
@@ -276,6 +280,7 @@ def handle_exts(exts):
 			"latedl",
 			"SVB-Vtflib",
 			"System2",
+			"SMJansson",
 		]
 		if args.L4D2:
 			exts += [
