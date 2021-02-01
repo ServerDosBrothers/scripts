@@ -1,5 +1,5 @@
 diff --git a/AMBuildScript b/AMBuildScript
-index e9bba9a..6b67263 100644
+index e9bba9a..18df873 100644
 --- a/AMBuildScript
 +++ b/AMBuildScript
 @@ -90,7 +90,7 @@ class ExtensionConfig(object):
@@ -11,6 +11,15 @@ index e9bba9a..6b67263 100644
        '-Wno-unused',
        '-Wno-switch',
        '-Wno-array-bounds',
+@@ -99,7 +99,7 @@ class ExtensionConfig(object):
+       '-fvisibility=hidden',
+     ]
+     cxx.cxxflags += [
+-      '-std=c++11',
++      '-std=c++14',
+       '-fno-exceptions',
+       '-fno-threadsafe-statics',
+       '-Wno-non-virtual-dtor',
 diff --git a/PackageScript b/PackageScript
 index b1532de..e671d37 100644
 --- a/PackageScript
@@ -29,7 +38,7 @@ index b1532de..e671d37 100644
  # Copy binaries.
  for cxx_task in Extension.extensions:
 diff --git a/curl/lib/config-sm-linux.h b/curl/lib/config-sm-linux.h
-index 74cec5b..36dd13a 100644
+index 74cec5b..c39271f 100644
 --- a/curl/lib/config-sm-linux.h
 +++ b/curl/lib/config-sm-linux.h
 @@ -675,7 +675,7 @@
@@ -37,7 +46,280 @@ index 74cec5b..36dd13a 100644
  
  /* Define to 1 if you have the <stropts.h> header file. */
 -#define HAVE_STROPTS_H 1
-+#undef HAVE_STROPTS_H
++//#define HAVE_STROPTS_H 1
  
  /* Define to 1 if you have the strstr function. */
  #define HAVE_STRSTR 1
+diff --git a/extension.h b/extension.h
+index 86c9f51..cb55c95 100644
+--- a/extension.h
++++ b/extension.h
+@@ -34,7 +34,7 @@
+ 
+ extern uv_loop_t *g_Loop;
+ 
+-typedef StringHashMap<ke::AString> HTTPHeaderMap;
++typedef StringHashMap<std::string> HTTPHeaderMap;
+ 
+ class IHTTPContext
+ {
+diff --git a/http_natives.cpp b/http_natives.cpp
+index 9a3ceea..940d789 100644
+--- a/http_natives.cpp
++++ b/http_natives.cpp
+@@ -414,15 +414,16 @@ static cell_t GetResponseHeader(IPluginContext *pContext, const cell_t *params)
+ 
+ 	char *name;
+ 	pContext->LocalToString(params[2], &name);
+-	const ke::AString lowercaseName = ke::AString(name).lowercase();
++	std::string lowercaseName = std::string(name);
++	std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), ::tolower);
+ 
+-	HTTPHeaderMap::Result header = response->headers.find(lowercaseName.chars());
++	HTTPHeaderMap::Result header = response->headers.find(lowercaseName.c_str());
+ 	if (!header.found())
+ 	{
+ 		return 0;
+ 	}
+ 
+-	pContext->StringToLocalUTF8(params[3], params[4], header->value.chars(), NULL);
++	pContext->StringToLocalUTF8(params[3], params[4], header->value.c_str(), NULL);
+ 
+ 	return 1;
+ }
+diff --git a/httpclient.cpp b/httpclient.cpp
+index b2dc71f..9fca5f8 100644
+--- a/httpclient.cpp
++++ b/httpclient.cpp
+@@ -23,14 +23,14 @@
+ #include "httprequestcontext.h"
+ #include "httpfilecontext.h"
+ 
+-const ke::AString HTTPClient::BuildURL(const ke::AString &endpoint) const
++const std::string HTTPClient::BuildURL(const std::string &endpoint) const
+ {
+ 	char *url = new char[this->baseURL.length() + endpoint.length() + 2];
+-	strcpy(url, this->baseURL.chars());
++	strcpy(url, this->baseURL.c_str());
+ 	strcat(url, "/");
+-	strcat(url, endpoint.chars());
++	strcat(url, endpoint.c_str());
+ 
+-	ke::AString ret(url);
++	std::string ret(url);
+ 	delete[] url;
+ 	return ret;
+ }
+@@ -48,7 +48,7 @@ struct curl_slist *HTTPClient::BuildHeaders(const char *acceptTypes, const char
+ 
+ 	for (HTTPHeaderMap::iterator iter = this->headers.iter(); !iter.empty(); iter.next())
+ 	{
+-		snprintf(header, sizeof(header), "%s: %s", iter->key.chars(), iter->value.chars());
++		snprintf(header, sizeof(header), "%s: %s", iter->key.c_str(), iter->value.c_str());
+ 		headers = curl_slist_append(headers, header);
+ 	}
+ 
+@@ -64,9 +64,9 @@ void HTTPClient::Request(const char *method, const char *endpoint, json_t *data,
+ 		return;
+ 	}
+ 
+-	const ke::AString url = this->BuildURL(ke::AString(endpoint));
++	const std::string url = this->BuildURL(std::string(endpoint));
+ 	struct curl_slist *headers = this->BuildHeaders("application/json", "application/json");
+-	HTTPRequestContext *context = new HTTPRequestContext(ke::AString(method), url, data, headers, forward, value,
++	HTTPRequestContext *context = new HTTPRequestContext(std::string(method), url, data, headers, forward, value,
+ 		this->connectTimeout, this->followLocation, this->timeout);
+ 
+ 	g_RipExt.AddRequestToQueue(context);
+@@ -81,9 +81,9 @@ void HTTPClient::DownloadFile(const char *endpoint, const char *path, IPluginFun
+ 		return;
+ 	}
+ 
+-	const ke::AString url = this->BuildURL(ke::AString(endpoint));
++	const std::string url = this->BuildURL(std::string(endpoint));
+ 	struct curl_slist *headers = this->BuildHeaders("*/*", "application/octet-stream");
+-	HTTPFileContext *context = new HTTPFileContext(false, url, ke::AString(path), headers, forward, value,
++	HTTPFileContext *context = new HTTPFileContext(false, url, std::string(path), headers, forward, value,
+ 		this->connectTimeout, this->followLocation, this->timeout);
+ 
+ 	g_RipExt.AddRequestToQueue(context);
+@@ -98,9 +98,9 @@ void HTTPClient::UploadFile(const char *endpoint, const char *path, IPluginFunct
+ 		return;
+ 	}
+ 
+-	const ke::AString url = this->BuildURL(ke::AString(endpoint));
++	const std::string url = this->BuildURL(std::string(endpoint));
+ 	struct curl_slist *headers = this->BuildHeaders("*/*", "application/octet-stream");
+-	HTTPFileContext *context = new HTTPFileContext(true, url, ke::AString(path), headers, forward, value,
++	HTTPFileContext *context = new HTTPFileContext(true, url, std::string(path), headers, forward, value,
+ 		this->connectTimeout, this->followLocation, this->timeout);
+ 
+ 	g_RipExt.AddRequestToQueue(context);
+@@ -108,8 +108,8 @@ void HTTPClient::UploadFile(const char *endpoint, const char *path, IPluginFunct
+ 
+ void HTTPClient::SetHeader(const char *name, const char *value)
+ {
+-	ke::AString vstr(value);
+-	this->headers.replace(name, ke::Move(vstr));
++	std::string vstr(value);
++	this->headers.replace(name, std::move(vstr));
+ }
+ 
+ int HTTPClient::GetConnectTimeout() const
+diff --git a/httpclient.h b/httpclient.h
+index 571d6ef..4448541 100644
+--- a/httpclient.h
++++ b/httpclient.h
+@@ -29,7 +29,7 @@ class HTTPClient
+ public:
+ 	HTTPClient(const char *baseURL) : baseURL(baseURL) {}
+ 
+-	const ke::AString BuildURL(const ke::AString &endpoint) const;
++	const std::string BuildURL(const std::string &endpoint) const;
+ 
+ 	struct curl_slist *BuildHeaders(const char *acceptTypes, const char *contentType);
+ 
+@@ -50,7 +50,7 @@ public:
+ 	void SetTimeout(int timeout);
+ 
+ private:
+-	const ke::AString baseURL;
++	const std::string baseURL;
+ 	HTTPHeaderMap headers;
+ 	int connectTimeout = 10;
+ 	bool followLocation = true;
+diff --git a/httpfilecontext.cpp b/httpfilecontext.cpp
+index 5b5405a..6fa06da 100644
+--- a/httpfilecontext.cpp
++++ b/httpfilecontext.cpp
+@@ -21,7 +21,7 @@
+ 
+ #include "httpfilecontext.h"
+ 
+-HTTPFileContext::HTTPFileContext(bool isUpload, const ke::AString &url, const ke::AString &path,
++HTTPFileContext::HTTPFileContext(bool isUpload, const std::string &url, const std::string &path,
+ 	struct curl_slist *headers, IChangeableForward *forward, cell_t value,
+ 	long connectTimeout, long followLocation, long timeout)
+ 	: isUpload(isUpload), url(url), path(path), headers(headers), forward(forward), value(value),
+@@ -51,12 +51,12 @@ void HTTPFileContext::InitCurl()
+ 	}
+ 
+ 	char realpath[PLATFORM_MAX_PATH];
+-	smutils->BuildPath(Path_Game, realpath, sizeof(realpath), "%s", path.chars());
++	smutils->BuildPath(Path_Game, realpath, sizeof(realpath), "%s", path.c_str());
+ 
+ 	file = fopen(realpath, isUpload ? "rb" : "wb");
+ 	if (file == NULL)
+ 	{
+-		smutils->LogError(myself, "Could not open file %s.", path.chars());
++		smutils->LogError(myself, "Could not open file %s.", path.c_str());
+ 		return;
+ 	}
+ 
+@@ -82,7 +82,7 @@ void HTTPFileContext::InitCurl()
+ 	curl_easy_setopt(curl, CURLOPT_PIPEWAIT, 1L);
+ 	curl_easy_setopt(curl, CURLOPT_PRIVATE, this);
+ 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+-	curl_easy_setopt(curl, CURLOPT_URL, url.chars());
++	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+ }
+ 
+ void HTTPFileContext::OnCompleted()
+diff --git a/httpfilecontext.h b/httpfilecontext.h
+index d633494..b297cf8 100644
+--- a/httpfilecontext.h
++++ b/httpfilecontext.h
+@@ -27,7 +27,7 @@
+ class HTTPFileContext : public IHTTPContext
+ {
+ public:
+-	HTTPFileContext(bool isUpload, const ke::AString &url, const ke::AString &path,
++	HTTPFileContext(bool isUpload, const std::string &url, const std::string &path,
+ 		struct curl_slist *headers, IChangeableForward *forward, cell_t value,
+ 		long connectTimeout, long followLocation, long timeout);
+ 	~HTTPFileContext();
+@@ -40,8 +40,8 @@ private:
+ 	FILE *file = NULL;
+ 
+ 	bool isUpload;
+-	const ke::AString url;
+-	const ke::AString path;
++	const std::string url;
++	const std::string path;
+ 	struct curl_slist *headers;
+ 	IChangeableForward *forward;
+ 	cell_t value;
+diff --git a/httprequestcontext.cpp b/httprequestcontext.cpp
+index 13aabed..db2202c 100644
+--- a/httprequestcontext.cpp
++++ b/httprequestcontext.cpp
+@@ -66,15 +66,17 @@ static size_t ReceiveResponseHeader(char *buffer, size_t size, size_t nmemb, voi
+ 		return total;
+ 	}
+ 
+-	ke::AString name(header, match - header);
+-	ke::AString value(match + 2);
++	std::string name(header, match - header);
++	std::string value(match + 2);
++	
++	std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+ 
+-	response->headers.replace(name.lowercase().chars(), ke::Move(value));
++	response->headers.replace(name.c_str(), std::move(value));
+ 
+ 	return total;
+ }
+ 
+-HTTPRequestContext::HTTPRequestContext(const ke::AString &method, const ke::AString &url, json_t *data,
++HTTPRequestContext::HTTPRequestContext(const std::string &method, const std::string &url, json_t *data,
+ 	struct curl_slist *headers, IChangeableForward *forward, cell_t value,
+ 	long connectTimeout, long followLocation, long timeout)
+ 	: request(data), method(method), url(url), headers(headers), forward(forward), value(value),
+@@ -110,12 +112,12 @@ void HTTPRequestContext::InitCurl()
+ 	}
+ 	else if (method.compare("PATCH") == 0)
+ 	{
+-		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.chars());
++		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+ 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
+ 	}
+ 	else if (method.compare("DELETE") == 0)
+ 	{
+-		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.chars());
++		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+ 	}
+ 
+ 	curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
+@@ -132,7 +134,7 @@ void HTTPRequestContext::InitCurl()
+ 	curl_easy_setopt(curl, CURLOPT_READDATA, &request);
+ 	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &ReadRequestBody);
+ 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+-	curl_easy_setopt(curl, CURLOPT_URL, url.chars());
++	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+ 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+ 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &WriteResponseBody);
+ }
+diff --git a/httprequestcontext.h b/httprequestcontext.h
+index 5407aa1..9cfa0ee 100644
+--- a/httprequestcontext.h
++++ b/httprequestcontext.h
+@@ -27,7 +27,7 @@
+ class HTTPRequestContext : public IHTTPContext
+ {
+ public:
+-	HTTPRequestContext(const ke::AString &method, const ke::AString &url, json_t *data,
++	HTTPRequestContext(const std::string &method, const std::string &url, json_t *data,
+ 		struct curl_slist *headers, IChangeableForward *forward, cell_t value,
+ 		long connectTimeout, long followLocation, long timeout);
+ 	~HTTPRequestContext();
+@@ -40,8 +40,8 @@ private:
+ 	struct HTTPRequest request;
+ 	struct HTTPResponse response;
+ 
+-	const ke::AString method;
+-	const ke::AString url;
++	const std::string method;
++	const std::string url;
+ 	struct curl_slist *headers;
+ 	IChangeableForward *forward;
+ 	cell_t value;

@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 84d6f20..71ba85a 100644
+index 84d6f20..fe8c633 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -5,17 +5,7 @@
@@ -54,10 +54,19 @@ index 84d6f20..71ba85a 100644
 -	INCLUDE += -I$(HL2PUB) -I$(HL2PUB)/engine -I$(HL2PUB)/tier0 -I$(HL2PUB)/tier1 -I$(METAMOD) \
 -		-I$(METAMOD)/sourcehook 
 +	INCLUDE += -I"$(HL2PUB)" -I"$(HL2PUB)/engine" -I"$(HL2PUB)/tier0" -I"$(HL2PUB)/tier1" -I"$(METAMOD)" \
-+		-I"$(METAMOD)/sourcehook" 
++		-I"$(METAMOD)/sourcehook"
  	CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_BLOODYGOODTIME=4 -DSE_EYE=5 \
  		-DSE_CSS=6 -DSE_ORANGEBOXVALVE=7 -DSE_LEFT4DEAD=8 -DSE_LEFT4DEAD2=9 -DSE_ALIENSWARM=10 \
  		-DSE_PORTAL2=11 -DSE_CSGO=12
+@@ -146,7 +136,7 @@ LINK += -m32 -ldl -lm
+ CFLAGS += -DPOSIX -Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp \
+ 	-D_snprintf=snprintf -D_vsnprintf=vsnprintf -D_alloca=alloca -Dstrcmpi=strcasecmp -DCOMPILER_GCC \
+ 	-Wno-switch -Wall -Werror -mfpmath=sse -msse -DSOURCEMOD_BUILD -DHAVE_STDINT_H -m32
+-CPPFLAGS += -Wno-non-virtual-dtor -Wno-delete-non-virtual-dtor -fno-exceptions -fno-rtti -fno-threadsafe-statics -std=c++11
++CPPFLAGS += -Wno-non-virtual-dtor -Wno-delete-non-virtual-dtor -fno-exceptions -fno-rtti -fno-threadsafe-statics -std=c++14
+ 
+ ################################################
+ ### DO NOT EDIT BELOW HERE FOR MOST PROJECTS ###
 @@ -194,13 +184,13 @@ $(BIN_DIR)/%.o: %.cpp
  	$(CPP) $(INCLUDE) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
  

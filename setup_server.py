@@ -237,7 +237,7 @@ def handle_ext(ext):
 		build_ambuild2(base_args_ext)
 		package.copy_folder(os.path.join(vtflib_src_dir,"build/package"),game)
 	elif ext == "System2":
-		print("eu esqueci pq desisti de faze o system2 compila tem q baixa manual")
+		print("eu esqueci pq desisti de faze o system2 compila vc tem q baixa manual")
 	elif ext == "l4dtoolz":
 		l4dz_src_dir = os.path.join(sources,"l4dtoolz")
 		os.chdir(l4dz_src_dir)
@@ -253,6 +253,7 @@ def handle_ext(ext):
 		package.copy_folder(os.path.join(l4dr_src_dir,"scripting"),os.path.join(game,"addons/sourcemod/scripting"))
 		package.copy_folder(os.path.join(l4dr_src_dir,"gamedata"),os.path.join(game,"addons/sourcemod/gamedata"))
 	elif ext == "SMJansson":
+		print("eu esqueci pq eu nunca fiz o smjansson compila se vira pra acha")
 		pass
 
 def handle_exts(exts):

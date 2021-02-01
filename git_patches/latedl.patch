@@ -1,5 +1,5 @@
 diff --git a/AMBuildScript b/AMBuildScript
-index 81a117d..9787029 100644
+index 81a117d..7fbcf6a 100644
 --- a/AMBuildScript
 +++ b/AMBuildScript
 @@ -169,7 +169,7 @@ class ExtensionConfig(object):
@@ -11,3 +11,12 @@ index 81a117d..9787029 100644
        '-Wno-unused',
        '-Wno-switch',
        '-Wno-array-bounds',
+@@ -178,7 +178,7 @@ class ExtensionConfig(object):
+       '-fvisibility=hidden',
+     ]
+     cxx.cxxflags += [
+-      '-std=c++11',
++      '-std=c++14',
+       '-fno-exceptions',
+       '-fno-threadsafe-statics',
+       '-Wno-non-virtual-dtor',
